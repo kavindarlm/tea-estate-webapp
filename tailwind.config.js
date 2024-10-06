@@ -7,6 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors:{
+        primaryGreen : '#0A340A',
+        logoColor: '#36CD01',
+        logoColorPro: '#F4FFC7',
+        sidebarHover: '#508D4E',
+        buttonColor: '#0E7F0C',
+        deleteButton: '#FF5E48',
+
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

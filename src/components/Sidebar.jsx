@@ -4,12 +4,14 @@ import {
   Bars3Icon,
   BellIcon,
   BuildingLibraryIcon,
-  CalendarIcon,
+  CalendarDaysIcon,
   ChartPieIcon,
   HomeIcon,
   ScaleIcon,
   UserGroupIcon,
   XMarkIcon,
+  WalletIcon,
+  MagnifyingGlassCircleIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 
@@ -19,7 +21,9 @@ const navigation = [
   { name: 'Employees List', href: '/employee-list', icon: UserGroupIcon, current: false },
   { name: 'Factory List', href: '/factory-list', icon: BuildingLibraryIcon, current: false },
   { name: 'Reports', href: '/reports', icon: ChartPieIcon, current: false },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon, current: false },
+  { name: 'Calendar', href: '/calendar', icon: CalendarDaysIcon, current: false },
+  { name: 'Salary', href: '/salary', icon: WalletIcon, current: false },
+  { name: 'Tea Health', href: '/tea-health', icon: MagnifyingGlassCircleIcon, current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -78,7 +82,7 @@ function Sidebar() {
                     </div>
                   </Transition.Child>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
-                  <div className="flex grow flex-col gap-y-5 overflow-y-auto  bg-green-400 px-6 pb-4">
+                  <div className="flex grow flex-col gap-y-5 overflow-y-auto  bg-primaryGreen px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center">
                       {/* <img
                         className="h-8 w-auto"
@@ -86,7 +90,7 @@ function Sidebar() {
                         alt="Your Company"
                       /> */}
                       <div className="flex h-16 shrink-0 items-center font-semibold text-xl">
-                        <div className='text-green-700'>Tea</div><div className='text-neutral-900'>Estate</div>
+                        <div className='text-logoColor'>TeaEstate</div><div className='text-logoColorPro'>Pro</div>
                       </div>
                     </div>
                     <nav className="flex flex-1 flex-col">
@@ -100,13 +104,13 @@ function Sidebar() {
                                   className={classNames(
                                     item.current
                                       ? 'bg-gray-500 text-white bg-opacity-50'
-                                      : 'text-neutral-900 hover:text-white hover:bg-gray-500 hover:bg-opacity-50',
+                                      : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
                                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                   )}
                                 >
                                   <item.icon
                                     className={classNames(
-                                      item.current ? 'text-white' : 'text-neutral-900 group-hover:text-white',
+                                      item.current ? 'text-white' : 'text-white group-hover:text-white',
                                       'h-6 w-6 shrink-0'
                                     )}
                                     aria-hidden="true"
@@ -129,9 +133,9 @@ function Sidebar() {
         {/* Static sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-green-400 px-6 pb-4">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primaryGreen px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center font-semibold text-xl">
-              <div className='text-green-700'>Tea</div><div className='text-neutral-900'>Estate</div>
+              <div className='text-logoColor'>TeaEstate</div><div className='text-logoColorPro'>Pro</div>
             </div>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -144,13 +148,13 @@ function Sidebar() {
                           className={classNames(
                             item.current
                               ? 'bg-gray-500 text-white bg-opacity-50'
-                              : 'text-neutral-900 hover:text-white hover:bg-gray-500 hover:bg-opacity-50',
+                              : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
                             'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                           )}
                         >
                           <item.icon
                             className={classNames(
-                              item.current ? 'text-white' : 'text-neutral-900 group-hover:text-white',
+                              item.current ? 'text-white' : 'text-white group-hover:text-white',
                               'h-6 w-6 shrink-0'
                             )}
                             aria-hidden="true"

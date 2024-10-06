@@ -33,7 +33,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     emp_weight: DataTypes.FLOAT,
     emp_weight_date: DataTypes.DATE,
-    emp_id: DataTypes.INTEGER,
+    emp_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Employee',
+        key: 'emp_id'
+      }
+    },
     created_by: DataTypes.INTEGER,
   }, {
     sequelize,

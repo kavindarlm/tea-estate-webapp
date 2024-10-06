@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
       FactoryWeight.belongsTo(models.Factory, {
         foreignKey: 'fac_id',
         onUpdate: 'CASCADE',
@@ -34,7 +33,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     fac_weight: DataTypes.FLOAT,
     fac_weight_date: DataTypes.DATE,
-    fac_id: DataTypes.INTEGER,
+    fac_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Factory',
+        key: 'fac_id'
+      }
+    },
     created_by: DataTypes.INTEGER,
   }, {
     sequelize,

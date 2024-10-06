@@ -5,7 +5,7 @@ import FactoryList from './FactoryList';
 
 function Factory() {
     return (
-        <div id="factory">
+        <div id="factory" className='min-h-screen'>
             <div className="py-5 lg:pl-72">
                 <div className="px-4 sm:px-6 lg:px-8">
                 <Header />

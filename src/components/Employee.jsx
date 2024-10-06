@@ -7,7 +7,7 @@ import EmployeeList from './EmployeeList';
 
 function Employee() {
     return (
-        <div id="employee">
+        <div id="employee" className='min-h-screen'>
             <div className="py-5 lg:pl-72">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <Header />
