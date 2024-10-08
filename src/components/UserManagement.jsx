@@ -1,45 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import Pagination from './reusable/pagination'; // Assuming you have a reusable Pagination component
-import AddNewEmployee from './AddNewEmployee'; // Assuming you have a component to add a new employee
-import Modal from './Modal'; // Import the Modal component
-import EditEmployee from './EditEmployee'; // Import the EditEmployee component
+import Header from './reusable/Header';
+import Pagination from './reusable/Pagination';
+import Modal from './Modal';
+import AddNewUser from './AddNewUser';
+import EditUser from './EditUser';
 
-function EmployeeList() {
-    const [employees, setEmployees] = useState([]);
+function UserMamanagement() {
+    const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isAddingEmployee, setIsAddingEmployee] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const employeesPerPage = 7;
+    const [isAddingUser, setIsAddingUser] = useState(false);
+    const [currentPage, setCCurrentPage] = useState(1);
+    const usersPerPage = 6;
     const [totalPages, setTotalPages] = useState(1);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
-        fetchEmployees();
-    }, [currentPage, employeesPerPage]);
+        fetchUsers();
+    }, [currentPage, usersPerPage]);
 
-    const fetchEmployees = async () => {
+    const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/employee/weight');
+            const response = await fetch('http://localhost:3000/api/user');
             if (!response.ok) {
-                console.error('Failed to fetch employee data:', response.status);
+                console.error('Failed to fetch user data:', response.status);
                 return;
             }
 
             const data = await response.json();
-            const startIndex = (currentPage - 1) * employeesPerPage;
-            const endIndex = startIndex + employeesPerPage;
-            setEmployees(data.slice(startIndex, endIndex));
-            setTotalPages(Math.ceil(data.length / employeesPerPage));
+            const startIndex = (currentPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            setUsers(data.slice(startIndex, endIndex));
+            setTotalPages(Math.ceil(data.length / usersPerPage));
             setIsLoading(false);
         } catch (error) {
-            console.error('Failed to fetch employee data:', error);
+            console.error('Failed to fetch user data:', error);
             setIsLoading(false);
         }
     };
 
-    const handleAddEmployeeClick = () => {
-        setIsAddingEmployee(true);
+    const handleAddUserClick = () => {
+        setIsAddingUser(true);
     };
 
     const handlePageChange = (pageNumber) => {
@@ -47,44 +48,44 @@ function EmployeeList() {
     };
 
     const handleEditClick = (id) => {
-        setSelectedEmployeeId(id);
+        setSelectedUserId(id);
         setIsEditModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsEditModalOpen(false);
-        setSelectedEmployeeId(null);
-        fetchEmployees();
+        setSelectedUserId(null);
+        fetchUsers();
     };
 
     if (isLoading) {
         return <div>Loading...</div>;
     }
 
-    if (isAddingEmployee) {
-        return <AddNewEmployee />;
+    if (isAddingUser) {
+        return <AddNewUser />;
     }
 
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-lg font-semibold leading-6 text-gray-900">Employees</h1>
+                    <h1 className="text-lg font-semibold leading-6 text-gray-900">User Management</h1>
                     <p className="mt-2 text-sm text-gray-700">
-                        A list of all the employees in your estate including their name, address, total weight, and more.
+                        Manage all the Estate Managers in your Tea Estate.
                     </p>
                 </div>
                 <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                     <button
                         type="button"
                         className="block rounded-md bg-buttonColor px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-                        onClick={handleAddEmployeeClick}
+                        onClick={handleAddUserClick}
                     >
-                        Add Employee
+                        Add User
                     </button>
                 </div>
             </div>
-            <div className={`mt-8 flow-root ${isEditModalOpen ? 'blur-sm' : ''}`}>
+            <div className={`mt-4 flow-root ${isEditModalOpen ? 'blur-sm' : ''}`}>
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <table className="min-w-full divide-y divide-gray-300">
@@ -94,7 +95,16 @@ function EmployeeList() {
                                         Name
                                     </th>
                                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Email
+                                    </th>
+                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Address
+                                    </th>
+                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Phone No.
+                                    </th>
+                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Role
                                     </th>
                                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         NIC
@@ -105,39 +115,42 @@ function EmployeeList() {
                                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Sex
                                     </th>
-                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Total Weight (Kg)
-                                    </th>
                                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
                                         <span className="sr-only">Edit</span>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white">
-                                {employees.map((employee) => (
-                                    <tr key={employee.emp_id}>
+                                {users.map((user) => (
+                                    <tr key={user.user_id}>
                                         <td className="pl-4 pr-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sm:pl-3">
-                                            {employee.emp_name}
+                                            {user.user_name}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {employee.emp_address}
+                                            {user.user_email}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {employee.emp_nic}
+                                            {user.user_address}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {employee.emp_age}
+                                            {user.user_phone}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {employee.emp_sex}
+                                            {user.user_role}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {employee.total_weight}
+                                            {user.user_nic}
+                                        </td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {user.user_age}
+                                        </td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {user.user_sex}
                                         </td>
                                         <td className="pr-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a
                                                 href="#"
-                                                onClick={() => handleEditClick(employee.emp_id)}
+                                                onClick={() => handleEditClick(user.user_id)}
                                                 className="text-green-500 hover:text-green-600"
                                             >
                                                 Edit
@@ -152,10 +165,10 @@ function EmployeeList() {
             </div>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             <Modal isOpen={isEditModalOpen} onClose={handleCloseModal}>
-                <EditEmployee employeeId={selectedEmployeeId} onClose={handleCloseModal} />
+                <EditUser userId={selectedUserId} onClose={handleCloseModal} />
             </Modal>
         </div>
     );
 }
 
-export default EmployeeList;
+export default UserMamanagement;

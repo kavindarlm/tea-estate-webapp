@@ -68,7 +68,7 @@ function Dashboard() {
     }, [ApexCharts]);
 
     return (
-        <div id="dashboard">
+        <div id="dashboard" className='min-h-screen'>
             <div className="py-5 lg:pl-72">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <Header />

@@ -51,7 +51,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     user_name: DataTypes.STRING,
     user_email: DataTypes.STRING,
-    password: DataTypes.STRING
+    user_address: DataTypes.STRING,
+    user_phone: DataTypes.STRING,
+    user_role: DataTypes.STRING,
+    user_nic: DataTypes.STRING,
+    user_age: DataTypes.INTEGER,
+    user_sex: DataTypes.STRING,
+    password: DataTypes.STRING,
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'User',
