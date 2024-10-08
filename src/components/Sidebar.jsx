@@ -14,6 +14,7 @@ import {
   MagnifyingGlassCircleIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { UserCircleIcon, UserIcon } from '@heroicons/react/24/solid'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Calendar', href: '/calendar', icon: CalendarDaysIcon, current: false },
   { name: 'Salary', href: '/salary', icon: WalletIcon, current: false },
   { name: 'Tea Health', href: '/tea-health', icon: MagnifyingGlassCircleIcon, current: false },
+  { name: 'User Management', href: '/user-management', icon: UserIcon, current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },

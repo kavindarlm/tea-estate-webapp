@@ -55,7 +55,6 @@ function AddNewEmployee() {
           return;
         }
         // Handle success response
-        alert('Employee created successfully');
         resetForm();
       } catch (error) {
         console.error('Error adding employee:', error);

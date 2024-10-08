@@ -1,6 +1,6 @@
 // src/services/teaWeightService.js
 
-const { TeaWeight } = require('../models');
+import { TeaWeight } from '../models';
 
 export const getAllTeaWeights = async () => {
     return await TeaWeight.findAll();

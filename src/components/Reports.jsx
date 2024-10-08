@@ -1,6 +1,5 @@
 import React from 'react';
 import Header from './reusable/Header';
-import Sidebar from './sidebar';
 
 
 function Reports() {

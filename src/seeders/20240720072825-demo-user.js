@@ -8,7 +8,14 @@ module.exports = {
     await queryInterface.bulkInsert('users', [{
       user_name: 'John Doe',
       user_email: 'john@example.com',
-      password: 'password123',
+      user_address: '1234 Main St',
+      user_phone: '123-456-7890',
+      user_role: 'user',
+      user_nic: '123456789V',
+      user_age: 30,
+      user_sex: 'Male',
+      password: '$2b$10$VBYFMel1JRQEfE1fgdsgrgeffdhht.h4LM2DjCXm/nAKccnK',
+      deleted: false,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});
