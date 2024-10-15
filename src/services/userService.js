@@ -101,3 +101,29 @@ export const deleteUser = async (id) => {
   
   return user;
 };
+
+
+// service for login user
+export const loginUser = async (email, password) => {
+  const user = await User.findOne({ where: { user_email: email } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    throw new Error('Invalid password');
+  }
+  
+  return user;
+};
+
+// service for logout user
+export const logoutUser = async (id) => {
+  const user = await User.findByPk(id);
+  if (!user) throw new Error('User not found');
+  return user;
+};
+
+
+

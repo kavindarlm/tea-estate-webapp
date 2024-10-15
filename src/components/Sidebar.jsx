@@ -1,5 +1,5 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react';
+import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
   BellIcon,
@@ -12,9 +12,10 @@ import {
   XMarkIcon,
   WalletIcon,
   MagnifyingGlassCircleIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { UserCircleIcon, UserIcon } from '@heroicons/react/24/solid'
+} from '@heroicons/react/24/outline';
+import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { UserCircleIcon, UserIcon } from '@heroicons/react/24/solid';
+import axios from 'axios';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
@@ -26,21 +27,36 @@ const navigation = [
   { name: 'Salary', href: '/salary', icon: WalletIcon, current: false },
   { name: 'Tea Health', href: '/tea-health', icon: MagnifyingGlassCircleIcon, current: false },
   { name: 'User Management', href: '/user-management', icon: UserIcon, current: false },
-]
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
+
 function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const userId = 1; // Replace with the actual user ID
+      await axios.post('/api/auth/logout', { userId });
+      // Perform any additional logout logic here, such as clearing local storage or redirecting
+      console.log('User logged out');
+      // For example, you might want to clear user data and redirect to the login page
+      // localStorage.removeItem('user');
+      // window.location.href = '/login';
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  const userNavigation = [
+    { name: 'Your profile', href: '#' },
+    { name: 'Sign out', href: '#', onClick: handleLogout },
+  ];
 
   return (
     <>
-
       <div>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
@@ -86,11 +102,6 @@ function Sidebar() {
                   {/* Sidebar component, swap this element with another sidebar if you like */}
                   <div className="flex grow flex-col gap-y-5 overflow-y-auto  bg-primaryGreen px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center">
-                      {/* <img
-                        className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=white"
-                        alt="Your Company"
-                      /> */}
                       <div className="flex h-16 shrink-0 items-center font-semibold text-xl">
                         <div className='text-logoColor'>TeaEstate</div><div className='text-logoColorPro'>Pro</div>
                       </div>
@@ -239,6 +250,7 @@ function Sidebar() {
                           {({ active }) => (
                             <a
                               href={item.href}
+                              onClick={item.onClick}
                               className={classNames(
                                 active ? 'bg-gray-50' : '',
                                 'block px-3 py-1 text-sm leading-6 text-gray-900'
@@ -255,15 +267,6 @@ function Sidebar() {
               </div>
             </div>
           </div>
-
-          {/* <main className="py-5">
-            <div className="px-4 sm:px-6 lg:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <p className="mt-2 text-sm text-gray-500">
-                    Welcome to the dashboard. Here you can view all the important information about your Tea Estate.
-                </p>
-            </div>
-          </main> */}
         </div>
       </div>
     </>

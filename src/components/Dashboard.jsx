@@ -48,7 +48,7 @@ function Dashboard() {
                 },
                 fill: {
                     opacity: 1,
-                    colors: ['#48FF99']
+                    colors: ['#36CD61']
                 },
                 tooltip: {
                     y: {
