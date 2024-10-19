@@ -27,5 +27,3 @@ export const deleteCalendar = async (id) => {
     if (!calendar) throw new Error('Calendar not found');
     return await calendar.destroy();
 }
-
-
