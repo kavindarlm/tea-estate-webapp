@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Pagination from './reusable/pagination'; // Assuming you have a reusable Pagination component
-import AddNewEmployee from './AddNewEmployee'; // Assuming you have a component to add a new employee
-import Modal from './Modal'; // Import the Modal component
-import EditEmployee from './EditEmployee'; // Import the EditEmployee component
+import Pagination from '../reusable/pagination'; // Assuming you have a reusable Pagination component
+import AddNewEmployee from '../employee/AddNewEmployee'; // Assuming you have a component to add a new employee
+import Modal from '../Modal'; // Import the Modal component
+import EditEmployee from '../employee/EditEmployee'; // Import the EditEmployee component
 
 function EmployeeList() {
     const [employees, setEmployees] = useState([]);

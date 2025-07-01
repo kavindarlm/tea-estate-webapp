@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import UserMamanagement from './UserManagement';
+import UserMamanagement from '../user/UserManagement';
 
 function AddNewUser() {
     const [isCancel, setIsCancel] = useState(false);

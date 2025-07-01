@@ -6,6 +6,7 @@ import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,9 +16,14 @@ function MyApp({ Component, pageProps }) {
     } else {
       router.push('/login');
     }
+    setIsLoading(false);
   }, [router]);
 
   const isLoginPage = router.pathname === '/login';
+
+  if (isLoading) {
+    return null; // Render nothing while loading
+  }
 
   return (
     <div className="bg-white">
@@ -26,7 +32,7 @@ function MyApp({ Component, pageProps }) {
         {isLoginPage ? (
           <UserLogin setIsLoggedIn={setIsLoggedIn} />
         ) : (
-          <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
+          isLoggedIn && <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
         )}
       </main>
     </div>

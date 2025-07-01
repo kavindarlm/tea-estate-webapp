@@ -26,14 +26,17 @@ function UserLogin({ setIsLoggedIn }) {
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
+      //print data
+      // console.log('Login successful:', data);
 
       // Store token in localStorage
       localStorage.setItem('token', data.token);
 
-      //print user id
-      console.log(data.user_id.user_id);
+      // Store user id in localStorage
+      localStorage.setItem('user_id', data.user_id.user_id);
 
+      //print user id
+      console.log('user id ',data.user_id.user_id);
 
       // Update login state
       setIsLoggedIn(true);

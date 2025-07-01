@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import EmployeeList from './EmployeeList';
+import EmployeeList from '../employee/EmployeeList';
 
 function AddNewEmployee() {
     const [isCancel, setIsCancel] = useState(false);

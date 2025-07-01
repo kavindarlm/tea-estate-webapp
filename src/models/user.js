@@ -1,7 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const bcrypt = require('bcrypt');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -41,7 +40,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'RESTRICT'
       });
     }
+
+    // Method to validate password
+    async validatePassword(password) {
+      return await bcrypt.compare(password, this.password);
+    }
   }
+
   User.init({
     user_id: {
       allowNull: false,
@@ -66,6 +71,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
+    hooks: {
+      beforeSave: async (user) => {
+        if (user.changed('password')) {
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      }
+    }
   });
+
   return User;
 };

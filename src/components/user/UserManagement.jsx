@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Header from './reusable/Header';
-import Pagination from './reusable/Pagination';
-import Modal from './Modal';
-import AddNewUser from './AddNewUser';
-import EditUser from './EditUser';
+import Header from '../reusable/Header';
+import Pagination from '../reusable/Pagination';
+import Modal from '../Modal';
+import AddNewUser from '../user/AddNewUser';
+import EditUser from '../user/EditUser';
 
 function UserMamanagement() {
     const [users, setUsers] = useState([]);

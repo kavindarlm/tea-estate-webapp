@@ -1,7 +1,7 @@
 import React, { useState } from 'react';  // Import useState to manage component state
-import AddNewTeaWeight from './AddNewTeaWeight';
+import AddNewTeaWeight from '../tea-weight/AddNewTeaWeight';
 import { useRouter } from 'next/router';
-import Pagination from './reusable/pagination';
+import Pagination from '../reusable/pagination';
 
 
 

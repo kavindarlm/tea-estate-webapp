@@ -125,5 +125,12 @@ export const logoutUser = async (id) => {
   return user;
 };
 
-
-
+// service for change password
+export const updateUserPassword = async (id, hashedPassword) => {
+  try {
+    await User.update({ password: hashedPassword }, { where: { user_id: id} });
+  } catch (error) {
+    console.error('Error updating user password:', error);
+    throw error;
+  }
+};

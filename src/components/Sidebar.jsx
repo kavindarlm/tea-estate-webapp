@@ -16,6 +16,8 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { UserCircleIcon, UserIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
+import Modal from './Modal';
+import ChangePassword from './ChangePassword';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
@@ -35,23 +37,34 @@ function classNames(...classes) {
 
 function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      const userId = 1; // Replace with the actual user ID
+      const userId = localStorage.getItem('user_id');
       await axios.post('/api/auth/logout', { userId });
-      // Perform any additional logout logic here, such as clearing local storage or redirecting
+
       console.log('User logged out');
-      // For example, you might want to clear user data and redirect to the login page
-      // localStorage.removeItem('user');
-      // window.location.href = '/login';
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_id');
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
 
+  const handlePasswordChangeClick = () => {
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsChangePasswordModalOpen(false);
+  };
+
   const userNavigation = [
-    { name: 'Your profile', href: '#' },
+    { name: 'Change password', href: '#', onClick: handlePasswordChangeClick },
     { name: 'Sign out', href: '#', onClick: handleLogout },
   ];
 
@@ -144,7 +157,7 @@ function Sidebar() {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primaryGreen px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center font-semibold text-xl">
@@ -183,7 +196,7 @@ function Sidebar() {
           </div>
         </div>
 
-        <div className="lg:pl-72">
+        <div className="lg:pl-64">
           <div className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
             <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
               <span className="sr-only">Open sidebar</span>
@@ -244,7 +257,7 @@ function Sidebar() {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                       {userNavigation.map((item) => (
                         <Menu.Item key={item.name}>
                           {({ active }) => (
@@ -269,6 +282,9 @@ function Sidebar() {
           </div>
         </div>
       </div>
+      <Modal isOpen={isChangePasswordModalOpen} onClose={handleCloseModal}>
+        <ChangePassword onClose={handleCloseModal} />
+      </Modal>
     </>
   );
 }

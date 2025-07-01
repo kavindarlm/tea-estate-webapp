@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
 import axios from 'axios';
-import Modal from './Modal'; // Import Modal component
+import Modal from '../Modal'; // Import Modal component
 import AddNote from './AddNote'; // Import AddNote component
 
 
@@ -149,7 +149,7 @@ const Calendar = () => {
 
     return (
         <div id="calendar" className='min-h-screen'>
-            <div className="py-5 lg:pl-72">
+            <div className="py-5 lg:pl-64">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="pt-1">
                         <h1 className="text-lg font-semibold text-gray-900">Calendar</h1>

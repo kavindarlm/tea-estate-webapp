@@ -1,7 +1,7 @@
 import AddNewTeaFactory from "./AddNewFactory";
 import React, { useState, useEffect } from 'react';  // Import useState to manage component state
-import Pagination from './reusable/pagination';
-import Modal from "./Modal";
+import Pagination from '../reusable/pagination';
+import Modal from "../Modal";
 import EditFactory from "./EditFactory";
 
 function FactoryList() {
