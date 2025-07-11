@@ -1,6 +1,6 @@
 // src/services/employeeService.js
 
-const { Employee } = require('../models');
+import { Employee } from '../models';
 
 export const getAllEmployees = async () => {
   return await Employee.findAll();

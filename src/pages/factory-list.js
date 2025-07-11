@@ -1,4 +1,4 @@
-import Factory from "@/components/Factory";
+import Factory from "@/components/factory/Factory";
 
 export default function FactoryListPage() {
     return <Factory />;

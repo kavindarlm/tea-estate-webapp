@@ -1,7 +1,7 @@
 // src/services/employeeWeightService.js
 
-const { EmployeeWeight, Employee, Sequelize } = require('../models');
-const { fn, col } = Sequelize;
+import { EmployeeWeight, Employee } from '../models';
+import { fn, col } from 'sequelize';
 
 // Fetch all employee weights
 export const getAllEmployeeWeights = async () => {
