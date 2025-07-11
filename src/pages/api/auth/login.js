@@ -14,14 +14,25 @@ export default async function handler(req, res) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.user_id, email: user.user_email },
+      { userId: user.user_id, email: user.user_email, role: user.user_role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    return res.status(200).json({ token , user_id: user});
+    // Return user data without password for security
+    const { password: userPassword, ...userWithoutPassword } = user.toJSON();
+
+    return res.status(200).json({ 
+      success: true,
+      token,
+      user: userWithoutPassword,
+      message: 'Login successful'
+    });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(401).json({ message: error.message });
+    return res.status(401).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 }

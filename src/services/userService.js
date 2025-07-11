@@ -3,6 +3,7 @@
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import { User } from '../models';
+import { grantSystemFeaturesToUser, convertPermissionsToFeatureIds } from './systemFeatureService';
 import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables from .env file
@@ -50,6 +51,9 @@ export const createUser = async (userData) => {
       throw new Error('Email already in use');
     }
 
+    // Extract permissions from userData
+    const { permissions, ...userDataWithoutPermissions } = userData;
+
     // Generate a temporary password
     const temporaryPassword = generateTemporaryPassword();
 
@@ -58,12 +62,25 @@ export const createUser = async (userData) => {
 
     // Add the temporary password to userData
     const userWithTempPassword = {
-      ...userData,
+      ...userDataWithoutPermissions,
       password: hashedPassword
     };
 
     // Create the user with the temporary password
     const newUser = await User.create(userWithTempPassword);
+
+    // Grant system features to user if permissions are provided and user role is 'User'
+    if (permissions && userData.user_role === 'User') {
+      try {
+        const featureIds = await convertPermissionsToFeatureIds(permissions);
+        if (featureIds.length > 0) {
+          await grantSystemFeaturesToUser(newUser.user_id, featureIds);
+        }
+      } catch (permissionError) {
+        console.error('Error granting permissions to user:', permissionError);
+        // Continue with user creation even if permissions fail
+      }
+    }
 
     // Send email with the temporary password
     const mailOptions = {
@@ -117,6 +134,11 @@ export const loginUser = async (email, password) => {
   
   return user;
 };
+
+// Check if user is admin (helper function)
+// export const isUserAdmin = (userRole) => {
+//   return userRole && userRole.toLowerCase() === 'admin';
+// };
 
 // service for logout user
 export const logoutUser = async (id) => {

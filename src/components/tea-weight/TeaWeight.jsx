@@ -5,7 +5,7 @@ import TeaWeightSummary from '../tea-weight/TeaWeightSummary';
 
 function TeaWeight() {
     return (
-        <div id="tea-weightsss">
+        <div id="tea-weight" className='min-h-screen'>
             <div className="py-5 lg:pl-64">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <Header />

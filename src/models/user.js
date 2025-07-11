@@ -39,6 +39,14 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       });
+
+      // Many-to-many relationship with SystemFeature through UserSystemFeature
+      User.belongsToMany(models.SystemFeature, {
+        through: models.UserSystemFeature,
+        foreignKey: 'user_id',
+        otherKey: 'system_feature_id',
+        as: 'systemFeatures'
+      });
     }
 
     // Method to validate password

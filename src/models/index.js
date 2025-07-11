@@ -7,6 +7,8 @@ const FactoryModel = require('./factory');
 const TeaWeightModel = require('./teaweight');
 const FactoryWeightModel = require('./factoryweight');
 const CalendarModel = require('./calendar');
+const SystemFeatureModel = require('./systemfeature');
+const UserSystemFeatureModel = require('./usersystemfeature');
 
 let sequelize;
 
@@ -20,6 +22,8 @@ const models = {
   TeaWeight: TeaWeightModel(sequelize, Sequelize.DataTypes),
   FactoryWeight: FactoryWeightModel(sequelize, Sequelize.DataTypes),
   Calendar: CalendarModel(sequelize, Sequelize.DataTypes),
+  SystemFeature: SystemFeatureModel(sequelize, Sequelize.DataTypes),
+  UserSystemFeature: UserSystemFeatureModel(sequelize, Sequelize.DataTypes),
 };
 
 sequelize

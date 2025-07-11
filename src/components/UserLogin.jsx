@@ -26,17 +26,23 @@ function UserLogin({ setIsLoggedIn }) {
       }
 
       const data = await response.json();
-      //print data
-      // console.log('Login successful:', data);
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      console.log('Login successful:', data);
 
       // Store token in localStorage
       localStorage.setItem('token', data.token);
 
-      // Store user id in localStorage
-      localStorage.setItem('user_id', data.user_id.user_id);
+      // Store user data in localStorage
+      localStorage.setItem('user_id', data.user.user_id);
+      localStorage.setItem('user_role', data.user.user_role);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      //print user id
-      console.log('user id ',data.user_id.user_id);
+      console.log('User ID:', data.user.user_id);
+      console.log('User Role:', data.user.user_role);
 
       // Update login state
       setIsLoggedIn(true);
@@ -44,6 +50,7 @@ function UserLogin({ setIsLoggedIn }) {
       // Redirect to the home page or dashboard
       router.push('/');
     } catch (error) {
+      console.error('Login error:', error);
       setError(error.message);
     }
   };

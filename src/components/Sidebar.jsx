@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -19,17 +19,18 @@ import axios from 'axios';
 import Modal from './Modal';
 import ChangePassword from './ChangePassword';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
-  { name: 'Tea Weight', href: '/tea-weight', icon: ScaleIcon, current: false },
-  { name: 'Employees List', href: '/employee-list', icon: UserGroupIcon, current: false },
-  { name: 'Factory List', href: '/factory-list', icon: BuildingLibraryIcon, current: false },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon, current: false },
-  { name: 'Calendar', href: '/calendar', icon: CalendarDaysIcon, current: false },
-  { name: 'Salary', href: '/salary', icon: WalletIcon, current: false },
-  { name: 'Tea Health', href: '/tea-health', icon: MagnifyingGlassCircleIcon, current: false },
-  { name: 'User Management', href: '/user-management', icon: UserIcon, current: false },
-];
+// Icon mapping for dynamic navigation
+const iconMap = {
+  'HomeIcon': HomeIcon,
+  'ScaleIcon': ScaleIcon,
+  'UserGroupIcon': UserGroupIcon,
+  'BuildingLibraryIcon': BuildingLibraryIcon,
+  'ChartPieIcon': ChartPieIcon,
+  'CalendarDaysIcon': CalendarDaysIcon,
+  'WalletIcon': WalletIcon,
+  'MagnifyingGlassCircleIcon': MagnifyingGlassCircleIcon,
+  'UserIcon': UserIcon
+};
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -38,6 +39,75 @@ function classNames(...classes) {
 function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [navigation, setNavigation] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch navigation items based on user permissions
+  useEffect(() => {
+    const fetchNavigation = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        let userRole = localStorage.getItem('user_role');
+        
+        // If user_role is not in localStorage, try to get it from user object or API
+        if (!userRole) {
+          const userStr = localStorage.getItem('user');
+          if (userStr) {
+            try {
+              const user = JSON.parse(userStr);
+              userRole = user.user_role;
+              // Store it in localStorage for future use
+              if (userRole) {
+                localStorage.setItem('user_role', userRole);
+              }
+            } catch (e) {
+              console.error('Error parsing user data from localStorage:', e);
+            }
+          }
+        }
+        
+        if (!userId) {
+          console.error('User ID not found in localStorage');
+          setLoading(false);
+          return;
+        }
+
+        // If still no userRole, default to 'User' for safety
+        if (!userRole) {
+          console.warn('User role not found, defaulting to "User"');
+          userRole = 'User';
+        }
+
+        console.log(`Fetching navigation for user ID: ${userId}, role: ${userRole}`);
+
+        const response = await fetch(`/api/system-features?type=sidebar&userId=${userId}&userRole=${userRole}`);
+        const data = await response.json();
+
+        if (data.success) {
+          // Map icons from string names to actual icon components
+          const navigationWithIcons = data.data.map(item => ({
+            ...item,
+            icon: iconMap[item.icon] || HomeIcon // Default to HomeIcon if not found
+          }));
+          
+          setNavigation(navigationWithIcons);
+          console.log(`Loaded ${navigationWithIcons.length} navigation items`);
+        } else {
+          console.error('Failed to fetch navigation:', data.message);
+          // Fallback to empty navigation if API fails
+          setNavigation([]);
+        }
+      } catch (error) {
+        console.error('Error fetching navigation:', error);
+        // Fallback to empty navigation if there's an error
+        setNavigation([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNavigation();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -49,6 +119,7 @@ function Sidebar() {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('user_id');
+      localStorage.removeItem('user_role');
       window.location.href = '/login';
     } catch (error) {
       console.error('Error logging out:', error);
@@ -123,28 +194,32 @@ function Sidebar() {
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
                           <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                              <li key={item.name}>
-                                <a
-                                  href={item.href}
-                                  className={classNames(
-                                    item.current
-                                      ? 'bg-gray-500 text-white bg-opacity-50'
-                                      : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                  )}
-                                >
-                                  <item.icon
+                            {loading ? (
+                              <li className="text-white p-2">Loading navigation...</li>
+                            ) : (
+                              navigation.map((item) => (
+                                <li key={item.name}>
+                                  <a
+                                    href={item.href}
                                     className={classNames(
-                                      item.current ? 'text-white' : 'text-white group-hover:text-white',
-                                      'h-6 w-6 shrink-0'
+                                      item.current
+                                        ? 'bg-gray-500 text-white bg-opacity-50'
+                                        : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
+                                      'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                     )}
-                                    aria-hidden="true"
-                                  />
-                                  {item.name}
-                                </a>
-                              </li>
-                            ))}
+                                  >
+                                    <item.icon
+                                      className={classNames(
+                                        item.current ? 'text-white' : 'text-white group-hover:text-white',
+                                        'h-6 w-6 shrink-0'
+                                      )}
+                                      aria-hidden="true"
+                                    />
+                                    {item.name}
+                                  </a>
+                                </li>
+                              ))
+                            )}
                           </ul>
                         </li>
                       </ul>
@@ -167,28 +242,32 @@ function Sidebar() {
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((item) => (
-                      <li key={item.name}>
-                        <a
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? 'bg-gray-500 text-white bg-opacity-50'
-                              : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
-                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                          )}
-                        >
-                          <item.icon
+                    {loading ? (
+                      <li className="text-white p-2">Loading navigation...</li>
+                    ) : (
+                      navigation.map((item) => (
+                        <li key={item.name}>
+                          <a
+                            href={item.href}
                             className={classNames(
-                              item.current ? 'text-white' : 'text-white group-hover:text-white',
-                              'h-6 w-6 shrink-0'
+                              item.current
+                                ? 'bg-gray-500 text-white bg-opacity-50'
+                                : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
+                              'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                             )}
-                            aria-hidden="true"
-                          />
-                          {item.name}
-                        </a>
-                      </li>
-                    ))}
+                          >
+                            <item.icon
+                              className={classNames(
+                                item.current ? 'text-white' : 'text-white group-hover:text-white',
+                                'h-6 w-6 shrink-0'
+                              )}
+                              aria-hidden="true"
+                            />
+                            {item.name}
+                          </a>
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </li>
               </ul>
@@ -224,10 +303,10 @@ function Sidebar() {
                 />
               </form>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                {/* <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                </button> */}
 
                 {/* Separator */}
                 <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
