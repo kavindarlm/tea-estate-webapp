@@ -1,6 +1,6 @@
 // src/services/employeeWeightService.js
 
-import { EmployeeWeight, Employee } from '../models';
+import { EmployeeWeight, Employee } from '../../models';
 import { fn, col } from 'sequelize';
 
 // Fetch all employee weights

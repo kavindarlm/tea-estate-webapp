@@ -1,6 +1,6 @@
 // src/services/factoryWeightService.js
 
-import { FactoryWeight, Factory } from '../models';
+import { FactoryWeight, Factory } from '../../models';
 import { fn, col } from 'sequelize';
 
 export const getAllFactoryWeights = async () => {

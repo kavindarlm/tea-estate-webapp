@@ -1,6 +1,6 @@
 // src/services/factoryService.js
 
-import { Factory } from '../models';
+import { Factory } from '../../models';
 
 export const getAllFactories = async () => {
     return await Factory.findAll();
