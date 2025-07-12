@@ -16,20 +16,25 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 &&
-      file !== basename &&
-      file.slice(-3) === '.js' &&
-      file.indexOf('.test.js') === -1
-    );
-  })
-  .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
-  });
+const Calendar = require('./calendar')(sequelize, Sequelize.DataTypes);
+const Employee = require('./employee')(sequelize, Sequelize.DataTypes);
+const EmployeeWeight = require('./employeeweight')(sequelize, Sequelize.DataTypes);
+const Factory = require('./factory')(sequelize, Sequelize.DataTypes);
+const FactoryWeight = require('./factoryweight')(sequelize, Sequelize.DataTypes);
+const SystemFeature = require('./systemfeature')(sequelize, Sequelize.DataTypes);
+const TeaWeight = require('./teaweight')(sequelize, Sequelize.DataTypes);
+const User = require('./user')(sequelize, Sequelize.DataTypes);
+const UserSystemFeature = require('./usersystemfeature')(sequelize, Sequelize.DataTypes);
+
+db.Calendar = Calendar;
+db.Employee = Employee;
+db.EmployeeWeight = EmployeeWeight;
+db.Factory = Factory;
+db.FactoryWeight = FactoryWeight;
+db.SystemFeature = SystemFeature;
+db.TeaWeight = TeaWeight;
+db.User = User;
+db.UserSystemFeature = UserSystemFeature;
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

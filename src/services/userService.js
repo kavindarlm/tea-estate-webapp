@@ -2,7 +2,7 @@
 
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import { User } from '../models';
+import { User } from '../../models';
 import { grantSystemFeaturesToUser, convertPermissionsToFeatureIds } from './systemFeatureService';
 import dotenv from 'dotenv';
 

@@ -1,6 +1,6 @@
 // src/services/employeeService.js
 
-import { Employee } from '../models';
+import { Employee } from '../../models';
 
 export const getAllEmployees = async () => {
   return await Employee.findAll();
