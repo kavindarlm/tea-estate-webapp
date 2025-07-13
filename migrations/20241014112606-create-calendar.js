@@ -18,6 +18,16 @@ module.exports = {
       cal_note: {
         type: Sequelize.TEXT
       },
+      created_by: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Users',
+          key: 'user_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
