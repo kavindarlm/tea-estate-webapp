@@ -1,15 +1,26 @@
-import { Calendar } from "../../models";
+const { Calendar } = require("../../models");
 
 export const getAllCalendars = async () => {
     return await Calendar.findAll();
 }   
 
+export const getCalendarsByUser = async (userId) => {
+    return await Calendar.findAll({ 
+        where: { created_by: userId } 
+    });
+}
+
 export const getCalendarByID = async (id) => {
     return await Calendar.findByPk(id);
 }
 
-export const getCalendarByDate = async (date) => {
-    return await Calendar.findOne({ where: { cal_date: date } });
+export const getCalendarByDateAndUser = async (date, userId) => {
+    return await Calendar.findOne({ 
+        where: { 
+            cal_date: date,
+            created_by: userId 
+        } 
+    });
 }
 
 export const createCalendar = async (calendarData) => {
