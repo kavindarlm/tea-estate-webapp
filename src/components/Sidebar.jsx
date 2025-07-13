@@ -14,7 +14,8 @@ import {
   MagnifyingGlassCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-import { UserCircleIcon, UserIcon } from '@heroicons/react/24/solid';
+import { UserIcon } from '@heroicons/react/24/solid';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import Modal from './Modal';
 import ChangePassword from './ChangePassword';
@@ -41,6 +42,7 @@ function Sidebar() {
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [navigation, setNavigation] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   // Fetch navigation items based on user permissions
   useEffect(() => {
@@ -87,7 +89,8 @@ function Sidebar() {
           // Map icons from string names to actual icon components
           const navigationWithIcons = data.data.map(item => ({
             ...item,
-            icon: iconMap[item.icon] || HomeIcon // Default to HomeIcon if not found
+            icon: iconMap[item.icon] || HomeIcon, // Default to HomeIcon if not found
+            current: router.pathname === item.href // Set current based on current route
           }));
           
           setNavigation(navigationWithIcons);
@@ -107,7 +110,7 @@ function Sidebar() {
     };
 
     fetchNavigation();
-  }, []);
+  }, [router.pathname]); // Re-run when route changes
 
   const handleLogout = async () => {
     try {
@@ -203,8 +206,8 @@ function Sidebar() {
                                     href={item.href}
                                     className={classNames(
                                       item.current
-                                        ? 'bg-gray-500 text-white bg-opacity-50'
-                                        : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
+                                        ? 'bg-sidebarActive text-white'
+                                        : 'text-white hover:text-white hover:bg-sidebarHover',
                                       'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                     )}
                                   >
@@ -251,8 +254,8 @@ function Sidebar() {
                             href={item.href}
                             className={classNames(
                               item.current
-                                ? 'bg-gray-500 text-white bg-opacity-50'
-                                : 'text-white hover:text-white hover:bg-sidebarHover hover:sidebarHover',
+                                ? 'bg-sidebarActive text-white'
+                                : 'text-white hover:text-white hover:bg-sidebarHover',
                               'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                             )}
                           >

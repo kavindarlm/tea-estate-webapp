@@ -2,6 +2,7 @@
 
 const { getAllCalendars, getCalendarsByUser, createCalendar } = require('../../../services/calendarService');
 const { getUserFromToken } = require('../../../utils/auth');
+const { User } = require('../../../models');
 
 export default async function handler(req, res) {
     const { method, body, query } = req;
@@ -32,9 +33,21 @@ export default async function handler(req, res) {
             case 'POST':
                 // Add user ID to the calendar data
                 const user = getUserFromToken(req);
+                let createdBy = 1; // Default fallback
+                
+                if (user && user.userId) {
+                    // Verify that the user exists in the database
+                    const userExists = await User.findByPk(user.userId);
+                    if (userExists && !userExists.deleted) {
+                        createdBy = user.userId;
+                    } else {
+                        console.warn(`User ID ${user.userId} does not exist or is deleted, using default user`);
+                    }
+                }
+                
                 const calendarData = {
                     ...body,
-                    created_by: user ? user.userId : 1 // Default to user 1 for demo
+                    created_by: createdBy
                 };
                 
                 const newCalendar = await createCalendar(calendarData);
