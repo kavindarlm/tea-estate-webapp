@@ -11,11 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
       Calendar.belongsTo(models.User, {
         foreignKey: 'created_by',
         onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
+        onDelete: 'SET NULL'
       });
     }
   }
@@ -28,7 +27,14 @@ module.exports = (sequelize, DataTypes) => {
     cal_date: DataTypes.DATE,
     cal_title: DataTypes.STRING,
     cal_note: DataTypes.TEXT,
-    created_by: DataTypes.INTEGER
+    created_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Users',
+        key: 'user_id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Calendar',
