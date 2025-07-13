@@ -11,7 +11,8 @@ module.exports = {
         primaryGreen : '#0A340A',
         logoColor: '#36CD01',
         logoColorPro: '#F4FFC7',
-        sidebarHover: '#508D4E',
+        sidebarHover: '#3C623B',
+        sidebarActive: '#4F794E',
         buttonColor: '#0E7F0C',
         deleteButton: '#FF5E48',
 
