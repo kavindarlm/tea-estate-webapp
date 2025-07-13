@@ -1,4 +1,4 @@
-const { Calendar } = require("../../models");
+import { Calendar } from "../../models";
 
 export const getAllCalendars = async () => {
     return await Calendar.findAll();
