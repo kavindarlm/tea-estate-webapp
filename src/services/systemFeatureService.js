@@ -1,6 +1,6 @@
 // src/services/systemFeatureService.js
 
-import { SystemFeature, User, UserSystemFeature } from '../models';
+import { SystemFeature, User, UserSystemFeature } from '../../models';
 
 // Get all system features
 export const getAllSystemFeatures = async () => {
