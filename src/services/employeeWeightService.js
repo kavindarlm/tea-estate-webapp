@@ -1,7 +1,7 @@
 // src/services/employeeWeightService.js
 
 import { EmployeeWeight, Employee } from '../../models';
-import { fn, col } from 'sequelize';
+import { fn, col, Op } from 'sequelize';
 
 // Fetch all employee weights
 export const getAllEmployeeWeights = async () => {
@@ -34,13 +34,33 @@ export const deleteEmployeeWeight = async (id) => {
 
 
 // Fetch total weight per employee including employee details
-export const getTotalWeightPerEmployee = async () => {
+export const getTotalWeightPerEmployee = async (dateFilter = null) => {
+    let whereClause = {};
+    
+    if (dateFilter) {
+        const { type, date } = dateFilter;
+        
+        if (type === 'day') {
+            // Filter for specific date
+            const targetDate = new Date(date);
+            const startOfDay = new Date(targetDate);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(targetDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            
+            whereClause.emp_weight_date = {
+                [Op.between]: [startOfDay, endOfDay]
+            };
+        }
+    }
+
     // Fetch total weights grouped by employee ID
     const totalWeights = await EmployeeWeight.findAll({
         attributes: [
             'emp_id',
             [fn('SUM', col('emp_weight')), 'total_weight']
         ],
+        where: whereClause,
         group: ['emp_id'],
         raw: true, // Ensures result is a plain object
     });
@@ -59,7 +79,7 @@ export const getTotalWeightPerEmployee = async () => {
 
     // Add total_weight to each employee
     employeesPlain.forEach(emp => {
-        emp.total_weight = parseFloat(totalWeightMap.get(emp.emp_id)) || '000.0';
+        emp.total_weight = parseFloat(totalWeightMap.get(emp.emp_id)) || 0;
     });
 
     return employeesPlain;

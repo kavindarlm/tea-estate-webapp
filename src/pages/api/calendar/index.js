@@ -2,7 +2,7 @@
 
 const { getAllCalendars, getCalendarsByUser, createCalendar } = require('../../../services/calendarService');
 const { getUserFromToken } = require('../../../utils/auth');
-const { User } = require('../../../models');
+const { User } = require('../../../../models');
 
 export default async function handler(req, res) {
     const { method, body, query } = req;

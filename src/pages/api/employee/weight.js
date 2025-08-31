@@ -3,13 +3,23 @@
 import { getTotalWeightPerEmployee } from '../../../services/employeeWeightService';
 
 export default async function handler(req, res) {
-    const { method } = req;
+    const { method, query } = req;
 
     try {
         switch (method) {
             case 'GET':
-                // Fetch employees with their total weight
-                const employeesWithTotalWeight = await getTotalWeightPerEmployee();
+                let dateFilter = null;
+                
+                // Check if date filtering parameters are provided
+                if (query.filterType && query.date) {
+                    dateFilter = {
+                        type: query.filterType, // 'day' for specific date filtering
+                        date: query.date
+                    };
+                }
+                
+                // Fetch employees with their total weight (filtered or unfiltered)
+                const employeesWithTotalWeight = await getTotalWeightPerEmployee(dateFilter);
                 console.log(employeesWithTotalWeight);
                 res.status(200).json(employeesWithTotalWeight);
                 break;

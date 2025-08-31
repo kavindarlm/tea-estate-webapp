@@ -1,17 +1,52 @@
 import { PhotoIcon, UserCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
 import TeaWeightSummary from "../tea-weight/TeaWeightSummary";
-import React, { useState } from "react"; // Import useState to manage component state
+import React, { useState, useEffect } from "react"; // Import useState and useEffect to manage component state
 
 function AddNewTeaWeight() {
   const [isCancel, setIsCancel] = useState(false);
   const [date, setDate] = useState("");
   const [totalWeight, setTotalWeight] = useState("");
-  const [employeeName, setEmployeeName] = useState("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [employeeWeight, setEmployeeWeight] = useState("");
-  const [factoryName, setFactoryName] = useState("");
+  const [selectedFactoryId, setSelectedFactoryId] = useState("");
   const [factoryWeight, setFactoryWeight] = useState("");
   const [employeeWeights, setEmployeeWeights] = useState([]); // State to hold employee data
   const [factoryWeights, setFactoryWeights] = useState([]); // State to hold factory data
+  const [employees, setEmployees] = useState([]); // State to hold all employees
+  const [factories, setFactories] = useState([]); // State to hold all factories
+
+  useEffect(() => {
+    fetchEmployees();
+    fetchFactories();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/employee');
+      if (!response.ok) {
+        console.error('Failed to fetch employees:', response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      console.error('Failed to fetch employees:', error);
+    }
+  };
+
+  const fetchFactories = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/factory');
+      if (!response.ok) {
+        console.error('Failed to fetch factories:', response.status);
+        return;
+      }
+      const data = await response.json();
+      setFactories(data);
+    } catch (error) {
+      console.error('Failed to fetch factories:', error);
+    }
+  };
 
   const handleCancelClick = () => {
     setIsCancel(true);
@@ -19,16 +54,38 @@ function AddNewTeaWeight() {
 
   const handleAddEmployeeClick = (e) => {
     e.preventDefault();
-    setEmployeeWeights([...employeeWeights, { name: employeeName, weight: employeeWeight }]);
-    setEmployeeName("");
-    setEmployeeWeight("");
+    if (!selectedEmployeeId || !employeeWeight) {
+      alert('Please select an employee and enter weight');
+      return;
+    }
+    const selectedEmployee = employees.find(emp => emp.emp_id == selectedEmployeeId);
+    if (selectedEmployee) {
+      setEmployeeWeights([...employeeWeights, { 
+        id: selectedEmployee.emp_id,
+        name: selectedEmployee.emp_name, 
+        weight: employeeWeight 
+      }]);
+      setSelectedEmployeeId("");
+      setEmployeeWeight("");
+    }
   };
 
   const handleAddFactoryClick = (e) => {
     e.preventDefault();
-    setFactoryWeights([...factoryWeights, { name: factoryName, weight: factoryWeight }]);
-    setFactoryName("");
-    setFactoryWeight("");
+    if (!selectedFactoryId || !factoryWeight) {
+      alert('Please select a factory and enter weight');
+      return;
+    }
+    const selectedFactory = factories.find(fac => fac.fac_id == selectedFactoryId);
+    if (selectedFactory) {
+      setFactoryWeights([...factoryWeights, { 
+        id: selectedFactory.fac_id,
+        name: selectedFactory.fac_name, 
+        weight: factoryWeight 
+      }]);
+      setSelectedFactoryId("");
+      setFactoryWeight("");
+    }
   };
 
   const handleDeleteEmployeeClick = (index) => {
@@ -37,6 +94,60 @@ function AddNewTeaWeight() {
 
   const handleDeleteFactoryClick = (index) => {
     setFactoryWeights(factoryWeights.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    
+    if (!date || !totalWeight) {
+      alert('Please enter date and total weight');
+      return;
+    }
+
+    if (employeeWeights.length === 0 && factoryWeights.length === 0) {
+      alert('Please add at least one employee or factory weight');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/teaWeight', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date,
+          totalWeight: parseFloat(totalWeight),
+          employeeWeights,
+          factoryWeights,
+          createdBy: 1 // You can get this from user context/session
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save tea weight');
+      }
+
+      const result = await response.json();
+      alert('Tea weight data saved successfully!');
+      
+      // Reset form
+      setDate("");
+      setTotalWeight("");
+      setEmployeeWeights([]);
+      setFactoryWeights([]);
+      setSelectedEmployeeId("");
+      setSelectedFactoryId("");
+      setEmployeeWeight("");
+      setFactoryWeight("");
+      
+      // Optionally redirect back to summary
+      setIsCancel(true);
+    } catch (error) {
+      console.error('Failed to save tea weight:', error);
+      alert('Failed to save tea weight: ' + error.message);
+    }
   };
 
   if (isCancel) {
@@ -104,16 +215,20 @@ function AddNewTeaWeight() {
                 Employee
               </label>
               <div className="mt-3">
-                <input
-                  type="text"
+                <select
                   name="employeeName"
                   id="employeeName"
-                  autoComplete="given-name"
-                  placeholder="Employee Name"
-                  value={employeeName}
-                  onChange={(e) => setEmployeeName(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
-                />
+                  value={selectedEmployeeId}
+                  onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                >
+                  <option value="">Select an employee</option>
+                  {employees.map((employee) => (
+                    <option key={employee.emp_id} value={employee.emp_id}>
+                      {employee.emp_name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -173,16 +288,20 @@ function AddNewTeaWeight() {
                 Factory
               </label>
               <div className="mt-3">
-                <input
-                  type="text"
+                <select
                   name="factoryName"
                   id="factoryName"
-                  autoComplete="given-name"
-                  placeholder="Factory Name"
-                  value={factoryName}
-                  onChange={(e) => setFactoryName(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
-                />
+                  value={selectedFactoryId}
+                  onChange={(e) => setSelectedFactoryId(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                >
+                  <option value="">Select a factory</option>
+                  {factories.map((factory) => (
+                    <option key={factory.fac_id} value={factory.fac_id}>
+                      {factory.fac_name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -248,6 +367,7 @@ function AddNewTeaWeight() {
         <button
           type="submit"
           className="rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          onClick={handleSave}
         >
           Save
         </button>
