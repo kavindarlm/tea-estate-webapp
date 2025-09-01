@@ -1,7 +1,7 @@
 // src/services/factoryWeightService.js
 
 import { FactoryWeight, Factory } from '../../models';
-import { fn, col } from 'sequelize';
+import { fn, col, Op } from 'sequelize';
 
 export const getAllFactoryWeights = async () => {
     return await FactoryWeight.findAll();
@@ -27,12 +27,32 @@ export const deleteFactoryWeight = async (id) => {
     return await factoryWeight.destroy();
 }
 
-export const getTotalWeightPerFactory = async () => {
+export const getTotalWeightPerFactory = async (dateFilter = null) => {
+    let whereClause = {};
+    
+    if (dateFilter) {
+        const { type, date } = dateFilter;
+        
+        if (type === 'day') {
+            // Filter for specific date
+            const targetDate = new Date(date);
+            const startOfDay = new Date(targetDate);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(targetDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            
+            whereClause.fac_weight_date = {
+                [Op.between]: [startOfDay, endOfDay]
+            };
+        }
+    }
+
     const totalWeights = await FactoryWeight.findAll({
         attributes: [
             'fac_id',
             [fn('SUM', col('fac_weight')), 'total_weight']
         ],
+        where: whereClause,
         group: ['fac_id'],
         raw: true,
     });
@@ -51,7 +71,7 @@ export const getTotalWeightPerFactory = async () => {
 
     // Add total_weight to each factory
     factoriesPlain.forEach(fac => {
-        fac.total_weight = parseFloat(totalWeightMap.get(fac.fac_id)) || '000.0';
+        fac.total_weight = parseFloat(totalWeightMap.get(fac.fac_id)) || 0;
     });
 
     return factoriesPlain;

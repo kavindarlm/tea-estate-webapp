@@ -13,14 +13,24 @@ function EmployeeList() {
     const [totalPages, setTotalPages] = useState(1);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+    const [filterType, setFilterType] = useState('all');  // Added state for filter type
+    const [selectedDate, setSelectedDate] = useState('');  // Added state for selected date
+    const [isFiltering, setIsFiltering] = useState(false);  // Added state to track filtering status
 
     useEffect(() => {
         fetchEmployees();
-    }, [currentPage, employeesPerPage]);
+    }, [currentPage, employeesPerPage, isFiltering, filterType, selectedDate]);
 
     const fetchEmployees = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/employee/weight');
+            let url = 'http://localhost:3000/api/employee/weight';
+            
+            // Add query parameters for filtering if needed
+            if (isFiltering && filterType !== 'all' && selectedDate) {
+                url += `?filterType=${filterType}&date=${selectedDate}`;
+            }
+            
+            const response = await fetch(url);
             if (!response.ok) {
                 console.error('Failed to fetch employee data:', response.status);
                 return;
@@ -57,6 +67,35 @@ function EmployeeList() {
         fetchEmployees();
     };
 
+    const handleFilterChange = (e) => {
+        setFilterType(e.target.value);
+        if (e.target.value === 'all') {
+            setIsFiltering(false);
+            setSelectedDate('');
+        }
+    };
+
+    const handleDateChange = (e) => {
+        setSelectedDate(e.target.value);
+    };
+
+    const handleApplyFilter = () => {
+        if (filterType !== 'all' && selectedDate) {
+            setIsFiltering(true);
+            setCurrentPage(1); // Reset to first page when filtering
+        } else if (filterType === 'all') {
+            setIsFiltering(false);
+            setSelectedDate('');
+        }
+    };
+
+    const handleClearFilter = () => {
+        setFilterType('all');
+        setSelectedDate('');
+        setIsFiltering(false);
+        setCurrentPage(1);
+    };
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -71,7 +110,7 @@ function EmployeeList() {
                 <div className="sm:flex-auto">
                     <h1 className="text-lg font-semibold leading-6 text-gray-900">Employees</h1>
                     <p className="mt-2 text-sm text-gray-700">
-                        A list of all the employees in your estate including their name, address, total weight, and more.
+                        A list of all the employees in your estate, including their name, address, total weight, and more.
                     </p>
                 </div>
                 <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -83,6 +122,66 @@ function EmployeeList() {
                         Add Employee
                     </button>
                 </div>
+            </div>
+
+            {/* Filter Section */}
+            <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+                <div className="flex flex-wrap items-end gap-4">
+                    <div className="flex-1 min-w-40">
+                        <label htmlFor="filterType" className="block text-sm font-medium text-gray-700 mb-1">
+                            Filter by
+                        </label>
+                        <select
+                            id="filterType"
+                            value={filterType}
+                            onChange={handleFilterChange}
+                            className="w-full p-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm text-black"
+                        >
+                            <option value="all">All-time total tea weight per employee</option>
+                            <option value="day">Specific-Date total tea weight per employee</option>
+                        </select>
+                    </div>
+                    
+                    {filterType !== 'all' && (
+                        <div className="flex-1 min-w-40">
+                            <label htmlFor="selectedDate" className="block text-sm font-medium text-gray-700 mb-1">
+                                Date
+                            </label>
+                            <input
+                                type="date"
+                                id="selectedDate"
+                                value={selectedDate}
+                                onChange={handleDateChange}
+                                className="w-full p-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm text-black"
+                            />
+                        </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleApplyFilter}
+                            disabled={filterType !== 'all' && !selectedDate}
+                            className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            Apply Filter
+                        </button>
+                        
+                        {(isFiltering || filterType !== 'all') && (
+                            <button
+                                onClick={handleClearFilter}
+                                className="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700"
+                            >
+                                Clear Filter
+                            </button>
+                        )}
+                    </div>
+                </div>
+                
+                {isFiltering && (
+                    <div className="mt-2 text-sm text-gray-600">
+                        Showing weights for date: {selectedDate}
+                    </div>
+                )}
             </div>
             <div className={`mt-8 flow-root ${isEditModalOpen ? 'blur-sm' : ''}`}>
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -106,7 +205,7 @@ function EmployeeList() {
                                         Sex
                                     </th>
                                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Total Weight (Kg)
+                                        Total Tea Weight (Kg)
                                     </th>
                                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
                                         <span className="sr-only">Edit</span>

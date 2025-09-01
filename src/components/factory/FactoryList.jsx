@@ -12,15 +12,20 @@ function FactoryList() {
   const [totalPages, setTotalPages] = useState(1);  // Added state to store total number of pages
   const [selectedFactoryId, setSelectedFactoryId] = useState(null);  // Added state to store selected employee ID
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);  // Added state to manage edit modal
-
-
-  useEffect(() => {
-    fetchFactories();
-  }, [currentPage, factoriesPerPage]);
+  const [filterType, setFilterType] = useState('all');  // Added state for filter type
+  const [selectedDate, setSelectedDate] = useState('');  // Added state for selected date
+  const [isFiltering, setIsFiltering] = useState(false);  // Added state to track filtering status
 
   const fetchFactories = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/factory/weight');
+      let url = 'http://localhost:3000/api/factory/weight';
+      
+      // Add query parameters for filtering if needed
+      if (isFiltering && filterType !== 'all' && selectedDate) {
+        url += `?filterType=${filterType}&date=${selectedDate}`;
+      }
+      
+      const response = await fetch(url);
       if (!response.ok) {
         console.error('Server responded with a non-2xx status:', response.status);
         return;
@@ -55,6 +60,40 @@ function FactoryList() {
     fetchFactories();
   }
 
+  const handleFilterChange = (e) => {
+    setFilterType(e.target.value);
+    if (e.target.value === 'all') {
+      setIsFiltering(false);
+      setSelectedDate('');
+    }
+  };
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
+
+  const handleApplyFilter = () => {
+    if (filterType !== 'all' && selectedDate) {
+      setIsFiltering(true);
+      setCurrentPage(1); // Reset to first page when filtering
+    } else if (filterType === 'all') {
+      setIsFiltering(false);
+      setSelectedDate('');
+    }
+  };
+
+  const handleClearFilter = () => {
+    setFilterType('all');
+    setSelectedDate('');
+    setIsFiltering(false);
+    setCurrentPage(1);
+  };
+
+  // Add effect to fetch data when filter changes
+  useEffect(() => {
+    fetchFactories();
+  }, [currentPage, factoriesPerPage, isFiltering, filterType, selectedDate]);
+
   // Conditionally render AddNewTeaWeight component if isAddingWeight is true
   if (isAddingFactory) {
     return <AddNewTeaFactory />;  // Return AddNewTeaWeight component
@@ -77,6 +116,66 @@ function FactoryList() {
             Add Factory
           </button>
         </div>
+      </div>
+
+      {/* Filter Section */}
+      <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-40">
+            <label htmlFor="filterType" className="block text-sm font-medium text-gray-700 mb-1">
+              Filter by
+            </label>
+            <select
+              id="filterType"
+              value={filterType}
+              onChange={handleFilterChange}
+              className="w-full p-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm text-black"
+            >
+              <option value="all">All-time total tea weight per factory</option>
+              <option value="day">Specific-Date total tea weight per factory</option>
+            </select>
+          </div>
+          
+          {filterType !== 'all' && (
+            <div className="flex-1 min-w-40">
+              <label htmlFor="selectedDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                id="selectedDate"
+                value={selectedDate}
+                onChange={handleDateChange}
+                className="w-full p-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm text-black"
+              />
+            </div>
+          )}
+          
+          <div className="flex gap-2">
+            <button
+              onClick={handleApplyFilter}
+              disabled={filterType !== 'all' && !selectedDate}
+              className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Apply Filter
+            </button>
+            
+            {(isFiltering || filterType !== 'all') && (
+              <button
+                onClick={handleClearFilter}
+                className="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700"
+              >
+                Clear Filter
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {isFiltering && (
+          <div className="mt-2 text-sm text-gray-600">
+            Showing weights for date: {selectedDate}
+          </div>
+        )}
       </div>
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
