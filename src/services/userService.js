@@ -5,8 +5,7 @@ import nodemailer from 'nodemailer';
 import { User } from '../../models';
 import { grantSystemFeaturesToUser, convertPermissionsToFeatureIds } from './systemFeatureService';
 import dotenv from 'dotenv';
-
-dotenv.config(); // Load environment variables from .env file
+dotenv.config();
 
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
@@ -150,6 +149,64 @@ export const updateUserPassword = async (id, hashedPassword) => {
     await User.update({ password: hashedPassword }, { where: { user_id: id} });
   } catch (error) {
     console.error('Error updating user password:', error);
+    throw error;
+  }
+};
+
+// service for forgot password
+export const forgotPassword = async (email) => {
+  try {
+    // Check if user exists with this email
+    const user = await User.findOne({ where: { user_email: email, deleted: false } });
+    if (!user) {
+      throw new Error('No account found with this email address');
+    }
+
+    // Generate a new temporary password
+    const temporaryPassword = generateTemporaryPassword();
+
+    // Hash the temporary password using bcrypt
+    const saltRounds = 10;
+    const hashedTempPassword = await bcrypt.hash(temporaryPassword, saltRounds);
+
+    // Update user's password in database
+    await User.update(
+      { password: hashedTempPassword }, 
+      { where: { user_id: user.user_id } }
+    );
+
+    // Send email with the temporary password
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset - TeaEstate Pro',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #16a34a;">TeaEstate Pro - Password Reset</h2>
+          <p>Hello ${user.user_name},</p>
+          <p>We received a request to reset your password. Your new temporary password is:</p>
+          <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <strong style="font-size: 18px; color: #1f2937;">${temporaryPassword}</strong>
+          </div>
+          <p><strong>Important:</strong> Please log in with this temporary password and change it immediately for security reasons.</p>
+          <p>If you did not request this password reset, please contact our support team immediately.</p>
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 14px;">
+            This is an automated message. Please do not reply to this email.
+          </p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('Password reset email sent successfully to:', email);
+
+    return {
+      success: true,
+      message: 'Password reset instructions have been sent to your email address'
+    };
+  } catch (error) {
+    console.error('Forgot password error:', error);
     throw error;
   }
 };

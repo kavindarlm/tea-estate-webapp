@@ -137,9 +137,13 @@ function UserLogin({ setIsLoggedIn }) {
                   </div>
 
                   <div className="text-sm leading-6">
-                    <a href="#" className="font-semibold text-green-600 hover:text-green-500">
+                    <button 
+                      type="button"
+                      onClick={() => router.push('/forgot-password')}
+                      className="font-semibold text-green-600 hover:text-green-500 bg-transparent border-none cursor-pointer"
+                    >
                       Forgot password?
-                    </a>
+                    </button>
                   </div>
                 </div>
 
