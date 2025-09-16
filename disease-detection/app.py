@@ -5,8 +5,6 @@ Simple API server to handle image uploads and return disease predictions
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import base64
-import os
 from model import detector
 
 app = Flask(__name__)

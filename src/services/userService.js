@@ -57,13 +57,10 @@ export const createUser = async (userData) => {
     // Generate a temporary password
     const temporaryPassword = generateTemporaryPassword();
 
-    // Hash the temporary password
-    const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
-
-    // Add the temporary password to userData
+    // Add the temporary password to userData (DO NOT hash here - model hook will handle it)
     const userWithTempPassword = {
       ...userDataWithoutPermissions,
-      password: hashedPassword
+      password: temporaryPassword
     };
 
     // Create the user with the temporary password
@@ -122,7 +119,7 @@ export const deleteUser = async (id) => {
 
 // service for login user
 export const loginUser = async (email, password) => {
-  const user = await User.findOne({ where: { user_email: email } });
+  const user = await User.findOne({ where: { user_email: email, deleted: false } });
   if (!user) {
     throw new Error('User not found');
   }

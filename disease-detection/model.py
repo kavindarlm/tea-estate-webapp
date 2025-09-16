@@ -1,7 +1,6 @@
 """
 Tea Leaf Disease Detection Model
 Based on the Kaggle tea leaves disease classification model
-Simplified version for easy deployment
 """
 
 import tensorflow as tf
