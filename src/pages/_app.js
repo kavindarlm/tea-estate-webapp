@@ -13,13 +13,14 @@ function MyApp({ Component, pageProps }) {
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
-    } else {
+    } else if (router.pathname !== '/login' && router.pathname !== '/forgot-password') {
       router.push('/login');
     }
     setIsLoading(false);
   }, [router]);
 
   const isLoginPage = router.pathname === '/login';
+  const isForgotPasswordPage = router.pathname === '/forgot-password';
 
   if (isLoading) {
     return null; // Render nothing while loading
@@ -28,9 +29,11 @@ function MyApp({ Component, pageProps }) {
   return (
     <div className="bg-white">
       <main>
-        {isLoggedIn && !isLoginPage && <Sidebar />}
+        {isLoggedIn && !isLoginPage && !isForgotPasswordPage && <Sidebar />}
         {isLoginPage ? (
           <UserLogin setIsLoggedIn={setIsLoggedIn} />
+        ) : isForgotPasswordPage ? (
+          <Component {...pageProps} />
         ) : (
           isLoggedIn && <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
         )}

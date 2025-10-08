@@ -33,7 +33,7 @@ export default function Home() {
   }, [router]);
 
   if (isLoading) {
-    return null; // Render nothing while loading
+    return null;
   }
 
   return isLoggedIn ? <Dashboard /> : null;

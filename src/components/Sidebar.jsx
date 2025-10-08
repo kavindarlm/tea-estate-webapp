@@ -37,11 +37,25 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+// Function to generate initials from user name
+function getInitials(name) {
+  if (!name) return 'U';
+  
+  const names = name.trim().split(' ');
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase();
+  }
+  
+  // Take first letter of first name and first letter of last name
+  return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+}
+
 function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [navigation, setNavigation] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('User');
   const router = useRouter();
 
   // Fetch navigation items based on user permissions
@@ -51,20 +65,21 @@ function Sidebar() {
         const userId = localStorage.getItem('user_id');
         let userRole = localStorage.getItem('user_role');
         
-        // If user_role is not in localStorage, try to get it from user object or API
-        if (!userRole) {
-          const userStr = localStorage.getItem('user');
-          if (userStr) {
-            try {
-              const user = JSON.parse(userStr);
+        // Get user name from localStorage
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            if (user.user_name) {
+              setUserName(user.user_name);
+            }
+            if (!userRole && user.user_role) {
               userRole = user.user_role;
               // Store it in localStorage for future use
-              if (userRole) {
-                localStorage.setItem('user_role', userRole);
-              }
-            } catch (e) {
-              console.error('Error parsing user data from localStorage:', e);
+              localStorage.setItem('user_role', userRole);
             }
+          } catch (e) {
+            console.error('Error parsing user data from localStorage:', e);
           }
         }
         
@@ -318,14 +333,12 @@ function Sidebar() {
                 <Menu as="div" className="relative">
                   <Menu.Button className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    <img
-                      className="h-8 w-8 rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
+                    <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-semibold">
+                      {getInitials(userName)}
+                    </div>
                     <span className="hidden lg:flex lg:items-center">
                       <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                        Tom Cook
+                        {userName}
                       </span>
                       <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
