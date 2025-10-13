@@ -17,6 +17,7 @@ function AddNewUser() {
   });
 
   const [userPermissions, setUserPermissions] = useState({});
+  const [errors, setErrors] = useState({});
 
   // Fetch available permissions from API
   useEffect(() => {
@@ -75,6 +76,13 @@ function AddNewUser() {
       ...userData,
       [name]: value,
     });
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: "",
+      });
+    }
   };
 
   const handlePermissionChange = (e) => {
@@ -102,10 +110,87 @@ function AddNewUser() {
         return acc;
       }, {})
     );
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate full name
+    if (!userData.user_name.trim()) {
+      newErrors.user_name = "Full name is required";
+    } else if (userData.user_name.trim().length < 2) {
+      newErrors.user_name = "Full name must be at least 2 characters";
+    } else if (!/^[a-zA-Z\s]+$/.test(userData.user_name.trim())) {
+      newErrors.user_name = "Full name should only contain letters and spaces";
+    }
+
+    // Validate email
+    if (!userData.user_email.trim()) {
+      newErrors.user_email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.user_email.trim())) {
+      newErrors.user_email = "Please enter a valid email address";
+    }
+
+    // Validate phone number
+    if (!userData.user_phone.trim()) {
+      newErrors.user_phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(userData.user_phone.trim())) {
+      newErrors.user_phone = "Phone number must be exactly 10 digits";
+    }
+
+    // Validate sex
+    if (!userData.user_sex) {
+      newErrors.user_sex = "Sex is required";
+    }
+
+    // Validate age
+    if (!userData.user_age) {
+      newErrors.user_age = "Age is required";
+    } else if (isNaN(userData.user_age) || userData.user_age < 18 || userData.user_age > 100) {
+      newErrors.user_age = "Age must be between 18 and 100";
+    }
+
+    // Validate NIC
+    if (!userData.user_nic.trim()) {
+      newErrors.user_nic = "NIC number is required";
+    } else if (!/^(?:\d{9}[vVxX]|\d{12})$/.test(userData.user_nic.trim())) {
+      newErrors.user_nic = "Please enter a valid NIC (9 digits + V/X or 12 digits)";
+    }
+
+    // Validate address
+    if (!userData.user_address.trim()) {
+      newErrors.user_address = "Address is required";
+    } else if (userData.user_address.trim().length < 5) {
+      newErrors.user_address = "Address must be at least 5 characters";
+    }
+
+    // Validate user role
+    if (!userData.user_role) {
+      newErrors.user_role = "User role is required";
+    }
+
+    // Validate permissions for User role
+    if (userData.user_role === "User") {
+      const hasAnyPermission = Object.values(userPermissions).some(permission => permission === true);
+      if (!hasAnyPermission) {
+        newErrors.permissions = "Please grant at least one permission to the user";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm()) {
+      alert("Please fix all validation errors before submitting");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/api/user", {
         method: "POST",
@@ -174,8 +259,13 @@ function AddNewUser() {
                   placeholder="Full name"
                   value={userData.user_name}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_name ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_name}</p>
+                )}
               </div>
             </div>
 
@@ -195,8 +285,13 @@ function AddNewUser() {
                   placeholder="Email address"
                   value={userData.user_email}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_email ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_email}</p>
+                )}
               </div>
             </div>
 
@@ -216,8 +311,13 @@ function AddNewUser() {
                   placeholder="Phone Number"
                   value={userData.user_phone}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_phone ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_phone && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_phone}</p>
+                )}
               </div>
             </div>
 
@@ -235,7 +335,9 @@ function AddNewUser() {
                   name="user_sex"
                   id="user_sex"
                   autoComplete="sex"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_sex ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 >
                   <option value="" disabled>
                     Sex
@@ -243,6 +345,9 @@ function AddNewUser() {
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </select>
+                {errors.user_sex && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_sex}</p>
+                )}
               </div>
             </div>
 
@@ -262,8 +367,13 @@ function AddNewUser() {
                   placeholder="Age"
                   value={userData.user_age}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_age ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_age && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_age}</p>
+                )}
               </div>
             </div>
 
@@ -283,8 +393,13 @@ function AddNewUser() {
                   placeholder="NIC Number"
                   value={userData.user_nic}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_nic ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_nic && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_nic}</p>
+                )}
               </div>
             </div>
 
@@ -304,8 +419,13 @@ function AddNewUser() {
                   placeholder="Address"
                   value={userData.user_address}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_address ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 />
+                {errors.user_address && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_address}</p>
+                )}
               </div>
             </div>
 
@@ -323,7 +443,9 @@ function AddNewUser() {
                   name="user_role"
                   id="user_role"
                   autoComplete="Role"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.user_role ? "ring-red-500" : "ring-gray-300"
+                  } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2`}
                 >
                   <option value="" disabled>
                     User role
@@ -331,6 +453,9 @@ function AddNewUser() {
                   <option value="Admin">Admin</option>
                   <option value="User">User</option>
                 </select>
+                {errors.user_role && (
+                  <p className="mt-1 text-sm text-red-600">{errors.user_role}</p>
+                )}
               </div>
             </div>
 
@@ -374,6 +499,9 @@ function AddNewUser() {
                       </div>
                     ))}
                   </div>
+                  {errors.permissions && (
+                    <p className="mt-2 text-sm text-red-600">{errors.permissions}</p>
+                  )}
                 </div>
               </div>
             )}
