@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./reusable/Header";
 import Modal from "./Modal";
 import SalaryConfigModal from "./SalaryConfigModal";
+import { apiRequest } from "@/utils/api";
 
 function Salary() {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -22,7 +23,7 @@ function Salary() {
 
   const fetchSalaryConfig = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/salary/config?active=true');
+      const response = await apiRequest('/api/salary/config?active=true');
       if (response.ok) {
         const config = await response.json();
         setSalaryConfig(config);
@@ -35,7 +36,7 @@ function Salary() {
   const calculateSalaries = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/api/salary/calculate?date=${selectedDate}`);
+      const response = await apiRequest(`/api/salary/calculate?date=${selectedDate}`);
       if (response.ok) {
         const data = await response.json();
         setSalaryData(data);
@@ -72,8 +73,8 @@ function Salary() {
   };
 
   return (
-    <div id="salary" className="min-h-screen">
-      <div className="py-5 lg:pl-64">
+    <div id="salary" className="flex-1 overflow-auto">
+      <div className="py-5">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">

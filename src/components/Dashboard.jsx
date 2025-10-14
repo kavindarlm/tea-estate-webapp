@@ -192,9 +192,9 @@ function Dashboard() {
     }, [ApexCharts, chartData]);
 
     return (
-        <div id="dashboard" className='min-h-screen'>
-            <div className="py-5 lg:pl-64">
-                <div className="px-4 sm:px-6 lg:px-8">
+        <div id="dashboard" className='flex-1 overflow-auto'>
+            <div className="py-5">
+                <div className="px-4 sm:px-6 lg:px-8 h-full flex flex-col">
                     <Header />
                     <div className="px-4 sm:px-6 lg:px-8 mt-10">
                         <h1 className="text-lg font-semibold leading-6 text-gray-900">Dashboard</h1>
@@ -260,7 +260,7 @@ function Dashboard() {
                         </div>
                     </div>
                     
-                    <div className="pt-5 mb-20">
+                    <div className="pt-5 flex-1 overflow-auto">
                         {loading ? (
                             <div className="flex justify-center items-center h-64">
                                 <div className="text-gray-500">Loading chart data...</div>

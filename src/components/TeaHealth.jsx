@@ -100,9 +100,26 @@ function TeaHealth() {
         }
     };
 
+    const getSeverityDescription = (severity) => {
+        switch (severity?.toLowerCase()) {
+            case 'none':
+                return 'No threat to plant health. Continue normal care routine.';
+            case 'low':
+            case 'low to moderate':
+                return 'Minor concern. Monitor regularly and apply basic preventive measures.';
+            case 'moderate':
+                return 'Moderate threat. Requires attention and treatment to prevent spread.';
+            case 'high':
+            case 'moderate to high':
+                return 'Serious threat. Immediate action required to prevent significant crop loss.';
+            default:
+                return 'Severity level unknown. Consult with expert for proper assessment.';
+        }
+    };
+
     return (
-        <div id="tea-health" className='min-h-screen'>
-            <div className="py-5 lg:pl-64">
+        <div id="tea-health" className='flex-1 overflow-auto'>
+            <div className="py-5">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
                         <h1 className="text-lg font-semibold text-gray-900">Tea Health</h1>
@@ -234,11 +251,16 @@ function TeaHealth() {
                                             <div className="space-y-2 text-sm text-gray-800">
                                                 <p><strong>Description:</strong> {analysisResult.disease_info.description}</p>
                                                 <p><strong>Treatment:</strong> {analysisResult.disease_info.treatment}</p>
-                                                <div className="flex items-center">
-                                                    <strong>Severity:</strong>
-                                                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(analysisResult.disease_info.severity)}`}>
-                                                        {analysisResult.disease_info.severity}
-                                                    </span>
+                                                <div>
+                                                    <div className="flex items-center mb-1">
+                                                        <strong>Severity:</strong>
+                                                        <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(analysisResult.disease_info.severity)}`}>
+                                                            {analysisResult.disease_info.severity}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-gray-600 italic">
+                                                        {getSeverityDescription(analysisResult.disease_info.severity)}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>

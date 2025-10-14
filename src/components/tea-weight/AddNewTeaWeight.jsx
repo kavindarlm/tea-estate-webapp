@@ -1,9 +1,12 @@
 import { PhotoIcon, UserCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
 import TeaWeightSummary from "../tea-weight/TeaWeightSummary";
 import React, { useState, useEffect } from "react"; // Import useState and useEffect to manage component state
+import { useToast } from "../reusable/Toaster";
+import { apiRequest } from "@/utils/api";
 
 function AddNewTeaWeight() {
   const [isCancel, setIsCancel] = useState(false);
+  const { showSuccess, showError, showWarning } = useToast();
   const [date, setDate] = useState("");
   const [totalWeight, setTotalWeight] = useState("");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
@@ -22,7 +25,7 @@ function AddNewTeaWeight() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/employee');
+      const response = await apiRequest('/api/employee');
       if (!response.ok) {
         console.error('Failed to fetch employees:', response.status);
         return;
@@ -36,7 +39,7 @@ function AddNewTeaWeight() {
 
   const fetchFactories = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/factory');
+      const response = await apiRequest('/api/factory');
       if (!response.ok) {
         console.error('Failed to fetch factories:', response.status);
         return;
@@ -55,7 +58,7 @@ function AddNewTeaWeight() {
   const handleAddEmployeeClick = (e) => {
     e.preventDefault();
     if (!selectedEmployeeId || !employeeWeight) {
-      alert('Please select an employee and enter weight');
+      showWarning('Please select an employee and enter weight');
       return;
     }
     const selectedEmployee = employees.find(emp => emp.emp_id == selectedEmployeeId);
@@ -73,7 +76,7 @@ function AddNewTeaWeight() {
   const handleAddFactoryClick = (e) => {
     e.preventDefault();
     if (!selectedFactoryId || !factoryWeight) {
-      alert('Please select a factory and enter weight');
+      showWarning('Please select a factory and enter weight');
       return;
     }
     const selectedFactory = factories.find(fac => fac.fac_id == selectedFactoryId);
@@ -100,17 +103,34 @@ function AddNewTeaWeight() {
     e.preventDefault();
     
     if (!date || !totalWeight) {
-      alert('Please enter date and total weight');
+      showWarning('Please enter date and total weight');
       return;
     }
 
     if (employeeWeights.length === 0 && factoryWeights.length === 0) {
-      alert('Please add at least one employee or factory weight');
+      showWarning('Please add at least one employee or factory weight');
+      return;
+    }
+
+    // Validate employee weights sum equals total weight
+    const employeeWeightSum = employeeWeights.reduce((sum, emp) => sum + parseFloat(emp.weight || 0), 0);
+    const totalWeightValue = parseFloat(totalWeight);
+    
+    if (Math.abs(employeeWeightSum - totalWeightValue) > 0.01) {
+      showError(`Validation Error: Sum of employee weights (${employeeWeightSum.toFixed(2)} kg) must equal the total weight (${totalWeightValue.toFixed(2)} kg)`);
+      return;
+    }
+
+    // Validate factory weights sum equals total weight
+    const factoryWeightSum = factoryWeights.reduce((sum, fac) => sum + parseFloat(fac.weight || 0), 0);
+    
+    if (Math.abs(factoryWeightSum - totalWeightValue) > 0.01) {
+      showError(`Validation Error: Sum of factory weights (${factoryWeightSum.toFixed(2)} kg) must equal the total weight (${totalWeightValue.toFixed(2)} kg)`);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/teaWeight', {
+      const response = await apiRequest('/api/teaWeight', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +150,7 @@ function AddNewTeaWeight() {
       }
 
       const result = await response.json();
-      alert('Tea weight data saved successfully!');
+      showSuccess('Tea weight data saved successfully!');
       
       // Reset form
       setDate("");
@@ -146,7 +166,7 @@ function AddNewTeaWeight() {
       setIsCancel(true);
     } catch (error) {
       console.error('Failed to save tea weight:', error);
-      alert('Failed to save tea weight: ' + error.message);
+      showError('Failed to save tea weight: ' + error.message);
     }
   };
 

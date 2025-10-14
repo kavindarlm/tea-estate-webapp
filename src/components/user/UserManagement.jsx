@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../reusable/Header';
 import Pagination from '../reusable/Pagination';
-import Modal from '../Modal';
 import AddNewUser from '../user/AddNewUser';
 import EditUser from '../user/EditUser';
+import { apiRequest } from '@/utils/api';
 
 function UserMamanagement() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAddingUser, setIsAddingUser] = useState(false);
+    const [isEditingUser, setIsEditingUser] = useState(false);
     const [currentPage, setCCurrentPage] = useState(1);
     const usersPerPage = 6;
     const [totalPages, setTotalPages] = useState(1);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
@@ -21,7 +20,7 @@ function UserMamanagement() {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/user');
+            const response = await apiRequest('/api/user');
             if (!response.ok) {
                 console.error('Failed to fetch user data:', response.status);
                 return;
@@ -49,11 +48,11 @@ function UserMamanagement() {
 
     const handleEditClick = (id) => {
         setSelectedUserId(id);
-        setIsEditModalOpen(true);
+        setIsEditingUser(true);
     };
 
-    const handleCloseModal = () => {
-        setIsEditModalOpen(false);
+    const handleCloseEdit = () => {
+        setIsEditingUser(false);
         setSelectedUserId(null);
         fetchUsers();
     };
@@ -64,6 +63,10 @@ function UserMamanagement() {
 
     if (isAddingUser) {
         return <AddNewUser />;
+    }
+
+    if (isEditingUser) {
+        return <EditUser userId={selectedUserId} onClose={handleCloseEdit} />;
     }
 
     return (
@@ -85,7 +88,7 @@ function UserMamanagement() {
                     </button>
                 </div>
             </div>
-            <div className={`mt-4 flow-root ${isEditModalOpen ? 'blur-sm' : ''}`}>
+            <div className="mt-4 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <table className="min-w-full divide-y divide-gray-300">
@@ -164,9 +167,6 @@ function UserMamanagement() {
                 </div>
             </div>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-            <Modal isOpen={isEditModalOpen} onClose={handleCloseModal}>
-                <EditUser userId={selectedUserId} onClose={handleCloseModal} />
-            </Modal>
         </div>
     );
 }

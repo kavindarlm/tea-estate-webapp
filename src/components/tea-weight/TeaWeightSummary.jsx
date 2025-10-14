@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react"; // Import useState and useEf
 import AddNewTeaWeight from "../tea-weight/AddNewTeaWeight";
 import { useRouter } from "next/router";
 import Pagination from "../reusable/pagination";
+import { useToast } from "../reusable/Toaster";
+import { apiRequest } from "@/utils/api";
 
 function TeaWeightSummary() {
   const router = useRouter();
@@ -12,6 +14,7 @@ function TeaWeightSummary() {
   const [isLoading, setIsLoading] = useState(true); // State to manage loading
   const [isDeleting, setIsDeleting] = useState(false); // State for delete operation
   const teaWeightsPerPage = 7; // Number of items per page
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     fetchTeaWeights();
@@ -20,7 +23,7 @@ function TeaWeightSummary() {
   const fetchTeaWeights = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3000/api/teaWeight');
+      const response = await apiRequest('/api/teaWeight');
       if (!response.ok) {
         console.error('Failed to fetch tea weights:', response.status);
         return;
@@ -65,7 +68,7 @@ function TeaWeightSummary() {
 
     try {
       setIsDeleting(true);
-      const response = await fetch(`http://localhost:3000/api/teaWeight/${teaWeightId}`, {
+      const response = await apiRequest(`/api/teaWeight/${teaWeightId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -78,13 +81,13 @@ function TeaWeightSummary() {
       }
 
       // Show success message
-      alert('Tea weight record deleted successfully!');
+      showSuccess(`Tea weight record for ${formatDate(date)} deleted successfully!`);
       
       // Refresh the tea weights list
       fetchTeaWeights();
     } catch (error) {
       console.error('Failed to delete tea weight:', error);
-      alert('Failed to delete tea weight: ' + error.message);
+      showError('Failed to delete tea weight: ' + error.message);
     } finally {
       setIsDeleting(false);
     }

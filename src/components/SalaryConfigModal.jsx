@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './reusable/Toaster';
+import { apiRequest } from '@/utils/api';
 
 function SalaryConfigModal({ onClose }) {
     const [baseAmount, setBaseAmount] = useState('');
@@ -6,6 +8,7 @@ function SalaryConfigModal({ onClose }) {
     const [perKgRate, setPerKgRate] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const { showSuccess, showError, showWarning } = useToast();
 
     useEffect(() => {
         fetchActiveConfig();
@@ -14,7 +17,7 @@ function SalaryConfigModal({ onClose }) {
     const fetchActiveConfig = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('http://localhost:3000/api/salary/config?active=true');
+            const response = await apiRequest('/api/salary/config?active=true');
             if (response.ok) {
                 const config = await response.json();
                 if (config) {
@@ -34,13 +37,13 @@ function SalaryConfigModal({ onClose }) {
         e.preventDefault();
         
         if (!baseAmount || !minimumKgThreshold || !perKgRate) {
-            alert('Please fill in all fields');
+            showWarning('Please fill in all fields');
             return;
         }
 
         try {
             setIsSaving(true);
-            const response = await fetch('http://localhost:3000/api/salary/config', {
+            const response = await apiRequest('/api/salary/config', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ function SalaryConfigModal({ onClose }) {
             });
 
             if (response.ok) {
-                alert('Salary configuration updated successfully!');
+                showSuccess('Salary configuration updated successfully!');
                 onClose();
             } else {
                 const errorData = await response.json();
@@ -62,7 +65,7 @@ function SalaryConfigModal({ onClose }) {
             }
         } catch (error) {
             console.error('Failed to save salary config:', error);
-            alert('Failed to save salary configuration: ' + error.message);
+            showError('Failed to save salary configuration: ' + error.message);
         } finally {
             setIsSaving(false);
         }

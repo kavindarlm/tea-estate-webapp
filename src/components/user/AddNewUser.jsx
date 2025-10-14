@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import UserMamanagement from "../user/UserManagement";
+import { useToast } from "../reusable/Toaster";
+import { apiRequest } from "@/utils/api";
 
 function AddNewUser() {
   const [isCancel, setIsCancel] = useState(false);
   const [availablePermissions, setAvailablePermissions] = useState([]);
+  const { showSuccess, showError, showWarning } = useToast();
 
   const [userData, setUserData] = useState({
     user_name: "",
@@ -59,7 +62,7 @@ function AddNewUser() {
         }
       } catch (error) {
         console.error("Error fetching permissions:", error);
-        alert("Failed to fetch permissions. Please try again later.");
+        showError("Failed to fetch permissions. Please try again later.");
       }
     };
 
@@ -187,12 +190,12 @@ function AddNewUser() {
 
     // Validate form before submission
     if (!validateForm()) {
-      alert("Please fix all validation errors before submitting");
+      showWarning("Please fix all validation errors before submitting");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/user", {
+      const response = await apiRequest("/api/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -204,7 +207,7 @@ function AddNewUser() {
           console.error(
             "Method Not Allowed. The server does not allow POST requests at this endpoint."
           );
-          alert(
+          showError(
             "Failed to create user. The server does not allow POST requests at this endpoint."
           );
         } else {
@@ -212,18 +215,19 @@ function AddNewUser() {
             "Server responded with a non-2xx status:",
             response.status
           );
-          alert(
+          showError(
             "Failed to create user. Please check the server configuration."
           );
         }
         return;
       }
       // Handle success response
+      showSuccess(`User "${userData.user_name}" created successfully!`);
       resetForm();
       setIsCancel(true);
     } catch (error) {
       console.error("Failed to create user:", error);
-      alert("Failed to create user. Please check the server configuration.");
+      showError("Failed to create user. Please check the server configuration.");
     }
   };
 

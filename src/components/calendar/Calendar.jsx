@@ -20,8 +20,9 @@ import {
 import axios from "axios";
 import Modal from "../Modal";
 import AddNote from "./AddNote";
+import { getApiUrl } from "@/utils/api";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = getApiUrl('/api');
 const HOLIDAYS_API_KEY = "koGMonCwz4UYVUjLMywpmV2Vc1CgaQDe";
 const COUNTRY_CODE = "LK";
 
@@ -370,8 +371,8 @@ const Calendar = () => {
   }, [currentMonth, selectedDate, holidayMap, notesMap, onDateClick]);
 
   return (
-    <div id="calendar" className="min-h-screen">
-      <div className="py-5 lg:pl-64">
+    <div id="calendar" className="flex-1 overflow-auto">
+      <div className="py-5">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="pt-1">
             <h1 className="text-lg font-semibold text-gray-900">Calendar</h1>
