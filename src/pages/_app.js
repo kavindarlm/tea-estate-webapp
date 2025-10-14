@@ -31,13 +31,16 @@ function MyApp({ Component, pageProps }) {
     <ToastProvider>
       <div className="bg-white">
         <main>
-          {isLoggedIn && !isLoginPage && !isForgotPasswordPage && <Sidebar />}
           {isLoginPage ? (
             <UserLogin setIsLoggedIn={setIsLoggedIn} />
           ) : isForgotPasswordPage ? (
             <Component {...pageProps} />
           ) : (
-            isLoggedIn && <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
+            isLoggedIn && (
+              <Sidebar>
+                <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
+              </Sidebar>
+            )
           )}
         </main>
       </div>

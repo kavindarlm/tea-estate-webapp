@@ -73,8 +73,8 @@ function Salary() {
   };
 
   return (
-    <div id="salary" className="min-h-screen">
-      <div className="py-5 lg:pl-64">
+    <div id="salary" className="flex-1 overflow-auto">
+      <div className="py-5">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">

@@ -371,8 +371,8 @@ const Calendar = () => {
   }, [currentMonth, selectedDate, holidayMap, notesMap, onDateClick]);
 
   return (
-    <div id="calendar" className="min-h-screen">
-      <div className="py-5 lg:pl-64">
+    <div id="calendar" className="flex-1 overflow-auto">
+      <div className="py-5">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="pt-1">
             <h1 className="text-lg font-semibold text-gray-900">Calendar</h1>

@@ -50,7 +50,7 @@ function getInitials(name) {
   return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
 }
 
-function Sidebar() {
+function Sidebar({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [navigation, setNavigation] = useState([]);
@@ -293,7 +293,7 @@ function Sidebar() {
           </div>
         </div>
 
-        <div className="lg:pl-64">
+        <div className="lg:pl-64 h-screen flex flex-col overflow-hidden">
           <div className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
             <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
               <span className="sr-only">Open sidebar</span>
@@ -375,6 +375,9 @@ function Sidebar() {
               </div>
             </div>
           </div>
+          
+          {/* Page Content */}
+          {children}
         </div>
       </div>
       <Modal isOpen={isChangePasswordModalOpen} onClose={handleCloseModal}>

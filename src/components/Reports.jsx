@@ -52,8 +52,8 @@ function Reports() {
 
   if (loading) {
     return (
-      <div id="reports" className="min-h-screen">
-        <div className="py-5 lg:pl-64">
+      <div id="reports" className="flex-1 overflow-auto">
+        <div className="py-5">
           <div className="px-4 sm:px-6 lg:px-8">
             <Header />
             <div className="flex justify-center items-center h-64">
@@ -66,8 +66,8 @@ function Reports() {
   }
 
   return (
-    <div id="reports" className="min-h-screen">
-      <div className="py-5 lg:pl-64">
+    <div id="reports" className="flex-1 overflow-auto">
+      <div className="py-5">
         <div className="px-4 sm:px-6 lg:px-8">
           <Header />
           <div className="pt-5">
