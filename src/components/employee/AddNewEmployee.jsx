@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import EmployeeList from '../employee/EmployeeList';
+import { useToast } from '../reusable/Toaster';
+import { apiRequest } from '@/utils/api';
 
 function AddNewEmployee() {
     const [isCancel, setIsCancel] = useState(false);
+    const { showSuccess, showError } = useToast();
 
     const [employeeData, setEmployeeData] = useState({
         emp_name: '',
@@ -37,7 +40,7 @@ function AddNewEmployee() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
-        const response = await fetch('http://localhost:3000/api/employee', {
+        const response = await apiRequest('/api/employee', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -47,18 +50,20 @@ function AddNewEmployee() {
         if (!response.ok) {
           if (response.status === 405) {
             console.error('Method Not Allowed. The server does not allow POST requests at this endpoint.');
-            alert('Failed to create employee. The server does not allow POST requests at this endpoint.');
+            showError('Failed to create employee. The server does not allow POST requests at this endpoint.');
           } else {
             console.error('Server responded with a non-2xx status:', response.status);
-            alert('Failed to create employee. Please check the server configuration.');
+            showError('Failed to create employee. Please check the server configuration.');
           }
           return;
         }
         // Handle success response
+        showSuccess(`Employee "${employeeData.emp_name}" added successfully!`);
         resetForm();
+        setIsCancel(true);
       } catch (error) {
         console.error('Error adding employee:', error);
-        alert('Error adding employee. Please check your network connection and server status.');
+        showError('Error adding employee. Please check your network connection and server status.');
       }
     };
 

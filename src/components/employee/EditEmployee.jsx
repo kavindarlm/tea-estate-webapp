@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useToast } from '../reusable/Toaster';
+import { apiRequest } from '@/utils/api';
 
 const EditEmployee = ({ employeeId, onClose }) => {
     const [employee, setEmployee] = useState({
@@ -9,6 +11,7 @@ const EditEmployee = ({ employeeId, onClose }) => {
         emp_address: ''
     });
     const [loading, setLoading] = useState(true);
+    const { showSuccess, showError } = useToast();
 
     useEffect(() => {
         if (employeeId) {
@@ -21,7 +24,7 @@ const EditEmployee = ({ employeeId, onClose }) => {
     const fetchEmployeeData = async (id) => {
         try {
             // Replace with your actual data fetching logic
-            const response = await fetch(`http://localhost:3000/api/employee/${id}`);
+            const response = await apiRequest(`/api/employee/${id}`);
             const data = await response.json();
             setEmployee(data);
             setLoading(false);
@@ -43,7 +46,7 @@ const EditEmployee = ({ employeeId, onClose }) => {
         e.preventDefault();
         try {
             // Replace with your actual data update logic
-            const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+            const response = await apiRequest(`/api/employee/${employeeId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -52,13 +55,15 @@ const EditEmployee = ({ employeeId, onClose }) => {
             });
             if (!response.ok) {
                 console.error('Failed to update employee data:', response.status);
+                showError('Failed to update employee data. Please try again.');
                 return;
             }
-            // alert('Employee data updated successfully');
+            showSuccess(`Employee "${employee.emp_name}" updated successfully!`);
             confirm('Do you want to close the modal?') && (onClose());
             onClose();
         } catch (error) {
             console.error('Error updating employee data:', error);
+            showError('Error updating employee data. Please try again.');
         }
     };
 
@@ -67,20 +72,22 @@ const EditEmployee = ({ employeeId, onClose }) => {
     };
 
     const handleDeleteClick = async () => {
-        if (confirm('Are you sure you want to delete this factory?')) {
+        if (confirm('Are you sure you want to delete this employee?')) {
             try {
                 // Replace with your actual data delete logic
-                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                const response = await apiRequest(`/api/employee/${employeeId}`, {
                     method: 'DELETE'
                 });
                 if (!response.ok) {
                     console.error('Failed to delete employee data:', response.status);
+                    showError('Failed to delete employee. Please try again.');
                     return;
                 }
-                // alert('Employee data deleted successfully');
+                showSuccess(`Employee "${employee.emp_name}" deleted successfully!`);
                 onClose();
             } catch (error) {
                 console.error('Error deleting employee data:', error);
+                showError('Error deleting employee. Please try again.');
             }
         }
     };

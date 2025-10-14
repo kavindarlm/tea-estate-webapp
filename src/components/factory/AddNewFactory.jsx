@@ -1,9 +1,12 @@
 import React, { useState } from 'react';  // Import useState to manage component state
 import FactoryList from './FactoryList';
+import { useToast } from '../reusable/Toaster';
+import { apiRequest } from '@/utils/api';
 
 
 function AddNewTeaFactory() {
     const[isCancel, setIsCancel] = useState(false);
+    const { showSuccess, showError } = useToast();
 
     const [factoryData, setFactoryData] = useState({
         fac_name: '',
@@ -34,7 +37,7 @@ function AddNewTeaFactory() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3000/api/factory', {
+            const response = await apiRequest('/api/factory', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,19 +47,20 @@ function AddNewTeaFactory() {
             if (!response.ok) {
                 if (response.status === 405) {
                     console.error('Method Not Allowed. The server does not allow POST requests at this endpoint.');
-                    alert('Failed to create factory. The server does not allow POST requests at this endpoint.');
+                    showError('Failed to create factory. The server does not allow POST requests at this endpoint.');
                 } else {
                     console.error('Server responded with a non-2xx status:', response.status);
-                    alert('Failed to create factory. Please check the server configuration.');
+                    showError('Failed to create factory. Please check the server configuration.');
                 }
                 return;
             }
             // Handle success response
-            alert('Factory created successfully');
+            showSuccess(`Factory "${factoryData.fac_name}" created successfully!`);
             resetForm();
+            setIsCancel(true);
         } catch (error) {
             console.error('Failed to create factory:', error);
-            alert('Failed to create factory. Please check the server configuration.');
+            showError('Failed to create factory. Please check the server configuration.');
         }
     };
 

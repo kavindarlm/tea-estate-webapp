@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { useToast } from "../reusable/Toaster";
+import { getApiUrl } from "@/utils/api";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = getApiUrl('/api');
 
 const AddNote = ({
   onClose,
@@ -17,6 +19,7 @@ const AddNote = ({
     cal_note: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const { showSuccess, showError, showWarning } = useToast();
 
   useEffect(() => {
     if (selectedDate) {
@@ -56,12 +59,12 @@ const AddNote = ({
 
     // Basic validation
     if (!note.cal_title?.trim()) {
-      alert("Please enter a note title");
+      showWarning("Please enter a note title");
       return;
     }
 
     if (!note.cal_date) {
-      alert("Please select a date");
+      showWarning("Please select a date");
       return;
     }
 
@@ -101,7 +104,7 @@ const AddNote = ({
           response.status,
           errorData
         );
-        alert(
+        showError(
           `Failed to ${isEditing ? "update" : "add"} note: ${
             errorData.error || "Unknown error"
           }`
@@ -109,12 +112,12 @@ const AddNote = ({
         return;
       }
 
-      alert(`Note ${isEditing ? "updated" : "added"} successfully`);
+      showSuccess(`Note "${note.cal_title}" ${isEditing ? "updated" : "added"} successfully!`);
       onSave && onSave(); // Trigger refresh
       onClose();
     } catch (error) {
       console.error(`Error ${isEditing ? "updating" : "adding"} note:`, error);
-      alert(
+      showError(
         `Error ${isEditing ? "updating" : "adding"} note: ${error.message}`
       );
     }
@@ -140,16 +143,16 @@ const AddNote = ({
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           console.error("Failed to delete note:", response.status, errorData);
-          alert(`Failed to delete note: ${errorData.error || "Unknown error"}`);
+          showError(`Failed to delete note: ${errorData.error || "Unknown error"}`);
           return;
         }
 
-        alert("Note deleted successfully");
+        showSuccess(`Note "${note.cal_title}" deleted successfully!`);
         onSave && onSave(); // Trigger refresh
         onClose();
       } catch (error) {
         console.error("Error deleting note:", error);
-        alert(`Error deleting note: ${error.message}`);
+        showError(`Error deleting note: ${error.message}`);
       }
     }
   };

@@ -70,4 +70,5 @@ if __name__ == '__main__':
     print("  POST /predict - Predict disease from image")
     print("  GET  /classes - Get all disease classes")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Run without debug mode to avoid auto-reload issues
+    app.run(host='0.0.0.0', port=5000, debug=False)

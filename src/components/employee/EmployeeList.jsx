@@ -3,6 +3,7 @@ import Pagination from '../reusable/pagination'; // Assuming you have a reusable
 import AddNewEmployee from '../employee/AddNewEmployee'; // Assuming you have a component to add a new employee
 import Modal from '../Modal'; // Import the Modal component
 import EditEmployee from '../employee/EditEmployee'; // Import the EditEmployee component
+import { apiRequest } from '@/utils/api';
 
 function EmployeeList() {
     const [employees, setEmployees] = useState([]);
@@ -23,14 +24,14 @@ function EmployeeList() {
 
     const fetchEmployees = async () => {
         try {
-            let url = 'http://localhost:3000/api/employee/weight';
+            let url = '/api/employee/weight';
             
             // Add query parameters for filtering if needed
             if (isFiltering && filterType !== 'all' && selectedDate) {
                 url += `?filterType=${filterType}&date=${selectedDate}`;
             }
             
-            const response = await fetch(url);
+            const response = await apiRequest(url);
             if (!response.ok) {
                 console.error('Failed to fetch employee data:', response.status);
                 return;

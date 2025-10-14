@@ -46,6 +46,7 @@ disease-detection/saved_models/
 disease-detection/*.h5
 disease-detection/*.pkl
 disease-detection/*.joblib
+disease-detection/data-set
 
 # IDE and Editor files
 .vscode/

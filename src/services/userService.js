@@ -44,37 +44,74 @@ export const getUserByID = async (id) => {
 // service for create new user
 export const createUser = async (userData) => {
   try {
-    // Check if the email is already in use
-    const existingUser = await User.findOne({ where: { user_email: userData.user_email, deleted: false } });
+    // Check if the email is already in use (including soft-deleted users)
+    const existingUser = await User.findOne({ where: { user_email: userData.user_email } });
+    
+    let newUser;
+    let temporaryPassword;
+    
     if (existingUser) {
-      throw new Error('Email already in use');
-    }
-
-    // Extract permissions from userData
-    const { permissions, ...userDataWithoutPermissions } = userData;
-
-    // Generate a temporary password
-    const temporaryPassword = generateTemporaryPassword();
-
-    // Add the temporary password to userData (DO NOT hash here - model hook will handle it)
-    const userWithTempPassword = {
-      ...userDataWithoutPermissions,
-      password: temporaryPassword
-    };
-
-    // Create the user with the temporary password
-    const newUser = await User.create(userWithTempPassword);
-
-    // Grant system features to user if permissions are provided and user role is 'User'
-    if (permissions && userData.user_role === 'User') {
-      try {
-        const featureIds = await convertPermissionsToFeatureIds(permissions);
-        if (featureIds.length > 0) {
-          await grantSystemFeaturesToUser(newUser.user_id, featureIds);
+      if (existingUser.deleted) {
+        // Reactivate the deleted user with new data
+        console.log('Reactivating deleted user with email:', userData.user_email);
+        
+        // Extract permissions from userData
+        const { permissions, ...userDataWithoutPermissions } = userData;
+        
+        // Generate a new temporary password
+        temporaryPassword = generateTemporaryPassword();
+        
+        // Update the existing user with new data and reactivate
+        await existingUser.update({
+          ...userDataWithoutPermissions,
+          password: temporaryPassword,
+          deleted: false
+        });
+        
+        newUser = existingUser;
+        
+        // Grant system features to user if permissions are provided and user role is 'User'
+        if (permissions && userData.user_role === 'User') {
+          try {
+            const featureIds = await convertPermissionsToFeatureIds(permissions);
+            if (featureIds.length > 0) {
+              await grantSystemFeaturesToUser(newUser.user_id, featureIds);
+            }
+          } catch (permissionError) {
+            console.error('Error granting permissions to user:', permissionError);
+            // Continue with user reactivation even if permissions fail
+          }
         }
-      } catch (permissionError) {
-        console.error('Error granting permissions to user:', permissionError);
-        // Continue with user creation even if permissions fail
+      } else {
+        throw new Error('Email already in use');
+      }
+    } else {
+      // Extract permissions from userData
+      const { permissions, ...userDataWithoutPermissions } = userData;
+
+      // Generate a temporary password
+      temporaryPassword = generateTemporaryPassword();
+
+      // Add the temporary password to userData (DO NOT hash here - model hook will handle it)
+      const userWithTempPassword = {
+        ...userDataWithoutPermissions,
+        password: temporaryPassword
+      };
+
+      // Create the user with the temporary password
+      newUser = await User.create(userWithTempPassword);
+
+      // Grant system features to user if permissions are provided and user role is 'User'
+      if (permissions && userData.user_role === 'User') {
+        try {
+          const featureIds = await convertPermissionsToFeatureIds(permissions);
+          if (featureIds.length > 0) {
+            await grantSystemFeaturesToUser(newUser.user_id, featureIds);
+          }
+        } catch (permissionError) {
+          console.error('Error granting permissions to user:', permissionError);
+          // Continue with user creation even if permissions fail
+        }
       }
     }
 
@@ -98,9 +135,37 @@ export const createUser = async (userData) => {
 
 // service for update user
 export const updateUser = async (id, userData) => {
-  const user = await User.findByPk(id);
-  if (!user) throw new Error('User not found');
-  return await user.update(userData);
+  try {
+    const user = await User.findByPk(id);
+    if (!user) throw new Error('User not found');
+
+    // Extract permissions from userData
+    const { permissions, ...userDataWithoutPermissions } = userData;
+
+    // Update user data
+    await user.update(userDataWithoutPermissions);
+
+    // Update system features if permissions are provided and user role is 'User'
+    if (permissions && userData.user_role === 'User') {
+      try {
+        const featureIds = await convertPermissionsToFeatureIds(permissions);
+        if (featureIds.length > 0) {
+          await grantSystemFeaturesToUser(user.user_id, featureIds);
+        } else {
+          // If no permissions are granted, remove all permissions
+          await grantSystemFeaturesToUser(user.user_id, []);
+        }
+      } catch (permissionError) {
+        console.error('Error updating permissions for user:', permissionError);
+        // Continue with user update even if permissions fail
+      }
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Failed to update user:', error);
+    throw error;
+  }
 };
 
 // service for delete user

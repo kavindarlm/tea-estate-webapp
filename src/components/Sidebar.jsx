@@ -304,7 +304,7 @@ function Sidebar() {
             <div className="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true" />
 
             <div className="flex flex-1 gap-x-4 lg:gap-x-6">
-              <form className="relative flex flex-1" action="#" method="GET">
+              {/* <form className="relative flex flex-1" action="#" method="GET">
                 <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
@@ -319,8 +319,8 @@ function Sidebar() {
                   type="search"
                   name="search"
                 />
-              </form>
-              <div className="flex items-center gap-x-4 lg:gap-x-6">
+              </form> */}
+              <div className="flex items-center gap-x-4 lg:gap-x-6 ml-auto">
                 {/* <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />

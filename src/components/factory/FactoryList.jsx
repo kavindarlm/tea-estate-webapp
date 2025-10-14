@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';  // Import useState to manag
 import Pagination from '../reusable/pagination';
 import Modal from "../Modal";
 import EditFactory from "./EditFactory";
+import { useToast } from "../reusable/Toaster";
+import { apiRequest } from "@/utils/api";
 
 function FactoryList() {
   const [isAddingFactory, setIsAddingFactory] = useState(false);  // Added state to manage view
@@ -15,17 +17,18 @@ function FactoryList() {
   const [filterType, setFilterType] = useState('all');  // Added state for filter type
   const [selectedDate, setSelectedDate] = useState('');  // Added state for selected date
   const [isFiltering, setIsFiltering] = useState(false);  // Added state to track filtering status
+  const { showError } = useToast();
 
   const fetchFactories = async () => {
     try {
-      let url = 'http://localhost:3000/api/factory/weight';
+      let url = '/api/factory/weight';
       
       // Add query parameters for filtering if needed
       if (isFiltering && filterType !== 'all' && selectedDate) {
         url += `?filterType=${filterType}&date=${selectedDate}`;
       }
       
-      const response = await fetch(url);
+      const response = await apiRequest(url);
       if (!response.ok) {
         console.error('Server responded with a non-2xx status:', response.status);
         return;
@@ -37,7 +40,7 @@ function FactoryList() {
       setTotalPages(Math.ceil(data.length / factoriesPerPage));
     } catch (error) {
       console.error('Failed to fetch factories:', error);
-      alert('Failed to fetch factories. Please check the server configuration.');
+      showError('Failed to fetch factories. Please check the server configuration.');
     }
   };
 

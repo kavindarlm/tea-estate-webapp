@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Sidebar from '../components/Sidebar';
 import UserLogin from '../components/UserLogin';
+import { ToastProvider } from '../components/reusable/Toaster';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
@@ -27,18 +28,20 @@ function MyApp({ Component, pageProps }) {
   }
 
   return (
-    <div className="bg-white">
-      <main>
-        {isLoggedIn && !isLoginPage && !isForgotPasswordPage && <Sidebar />}
-        {isLoginPage ? (
-          <UserLogin setIsLoggedIn={setIsLoggedIn} />
-        ) : isForgotPasswordPage ? (
-          <Component {...pageProps} />
-        ) : (
-          isLoggedIn && <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
-        )}
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="bg-white">
+        <main>
+          {isLoggedIn && !isLoginPage && !isForgotPasswordPage && <Sidebar />}
+          {isLoginPage ? (
+            <UserLogin setIsLoggedIn={setIsLoggedIn} />
+          ) : isForgotPasswordPage ? (
+            <Component {...pageProps} />
+          ) : (
+            isLoggedIn && <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
+          )}
+        </main>
+      </div>
+    </ToastProvider>
   );
 }
 

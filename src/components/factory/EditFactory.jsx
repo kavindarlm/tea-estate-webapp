@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useToast } from '../reusable/Toaster';
+import { apiRequest } from '@/utils/api';
 
 const EditFactory = ({ factoryId, onClose }) => {
     const [factory, setFactory] = useState({
@@ -7,6 +9,7 @@ const EditFactory = ({ factoryId, onClose }) => {
         fac_address: ''
     });
     const [loading, setLoading] = useState(true);
+    const { showSuccess, showError } = useToast();
 
     useEffect(() => {
         if (factoryId) {
@@ -16,7 +19,7 @@ const EditFactory = ({ factoryId, onClose }) => {
 
     const fetchFactoryData = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/factory/${id}`);
+            const response = await apiRequest(`/api/factory/${id}`);
             const data = await response.json();
             setFactory(data);
             setLoading(false);
@@ -38,7 +41,7 @@ const EditFactory = ({ factoryId, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:3000/api/factory/${factoryId}`, {
+            const response = await apiRequest(`/api/factory/${factoryId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -47,12 +50,14 @@ const EditFactory = ({ factoryId, onClose }) => {
             });
             if (!response.ok) {
                 console.error('Failed to update factory data:', response.status);
+                showError('Failed to update factory data. Please try again.');
                 return;
             }
-            alert('Factory data updated successfully');
+            showSuccess(`Factory "${factory.fac_name}" updated successfully!`);
             onClose();
         } catch (error) {
             console.error('Error updating factory data:', error);
+            showError('Error updating factory data. Please try again.');
         }
     };
 
@@ -63,16 +68,19 @@ const EditFactory = ({ factoryId, onClose }) => {
     const handleDeleteClick = async () => {
         if (confirm('Are you sure you want to delete this factory?')) {
             try {
-                const response = await fetch(`http://localhost:3000/api/factory/${factoryId}`, {
+                const response = await apiRequest(`/api/factory/${factoryId}`, {
                     method: 'DELETE'
                 });
                 if (!response.ok) {
                     console.error('Failed to delete factory data:', response.status);
+                    showError('Failed to delete factory. Please try again.');
                     return;
                 }
+                showSuccess(`Factory "${factory.fac_name}" deleted successfully!`);
                 onClose();
             } catch (error) {
                 console.error('Error deleting factory data:', error);
+                showError('Error deleting factory. Please try again.');
             }
         }
     };

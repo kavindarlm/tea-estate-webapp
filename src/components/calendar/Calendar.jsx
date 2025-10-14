@@ -20,8 +20,9 @@ import {
 import axios from "axios";
 import Modal from "../Modal";
 import AddNote from "./AddNote";
+import { getApiUrl } from "@/utils/api";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = getApiUrl('/api');
 const HOLIDAYS_API_KEY = "koGMonCwz4UYVUjLMywpmV2Vc1CgaQDe";
 const COUNTRY_CODE = "LK";
 
